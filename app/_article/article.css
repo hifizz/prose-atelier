@@ -132,7 +132,7 @@
   font-weight: 460;
   line-height: 1.25rem;
   letter-spacing: -0.005rem;
-  color: var(--art-text-soft);
+  color: var(--art-text);
 }
 
 .art-article p strong,
