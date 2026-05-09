@@ -1,0 +1,32 @@
+/* Mermaid host block. Centers the diagram, gives it the same surface
+   tone as code blocks, and constrains the SVG width to the column. */
+
+.mermaid-block {
+  margin: 0.75rem 0;
+  padding: 1.25rem 1rem;
+  background: #f6f6f4;
+  border-radius: 0.625rem;
+  display: flex;
+  justify-content: center;
+}
+
+.mermaid-block .mermaid-body {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mermaid-block svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-error {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(220, 53, 69, 0.06);
+  border-left: 3px solid rgba(220, 53, 69, 0.5);
+  border-radius: 0.25rem;
+  color: rgba(220, 53, 69, 0.85);
+  font-size: 0.8125rem;
+}

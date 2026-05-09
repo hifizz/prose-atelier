@@ -2,10 +2,14 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import "./article.css";
-import "@/app/_codeblock/code-block.css";
+import "./code-block.css";
+import "./mermaid-block.css";
 import { articleFontClass } from "./fonts";
 import { ArticleToc } from "./article-toc";
 
+/* The shape of an article's frontmatter, after YAML parsing. Everything
+   is optional except `title`. The renderer (renderer.tsx) extracts this
+   from the .mdx file and hands it to ArticleLayout as `meta`. */
 export type ArticleMeta = {
   title: string;
   date?: string;
@@ -21,7 +25,7 @@ export function ArticleLayout({
   meta: ArticleMeta;
   children: ReactNode;
 }) {
-  const back = meta.back ?? { href: "/", label: "← /playground" };
+  const back = meta.back ?? { href: "/", label: "← back" };
   const tocCfg = meta.toc === false ? null : meta.toc ?? {};
 
   return (

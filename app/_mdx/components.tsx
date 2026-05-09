@@ -70,7 +70,14 @@ function HR() {
   return <hr className="art-divider-dots" role="separator" />;
 }
 
+/* Components MDX files can use by name (no imports needed since we render
+   at runtime via next-mdx-remote). MDX element overrides + the editorial
+   primitives (Demo / DemoFrame / DemoCaption) live together so a vendoring
+   project gets them all in one map. */
 export const articleMdxComponents: MDXComponents = {
   h2: H2,
   hr: HR,
+  Demo,
+  DemoFrame,
+  DemoCaption,
 };

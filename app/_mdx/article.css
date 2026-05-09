@@ -174,7 +174,8 @@
   border-color: #666;
 }
 
-/* Code (inline + block — no syntax highlighter; styling only). */
+/* Inline code only — block <pre> styling lives in code-block.css since
+   CodeBlock wraps Shiki's <pre> in a <figure className="cb-figure">. */
 .art-article :not(pre) > code {
   font-family: "SF Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
     Courier, monospace;
@@ -183,25 +184,6 @@
   background: #efefec;
   border-radius: 0.25rem;
   color: var(--art-text-strong);
-}
-.art-article pre {
-  margin: 0.5rem 0;
-  padding: 1rem 1.125rem;
-  background: #f6f6f4;
-  border-radius: 0.625rem;
-  overflow-x: auto;
-  font-family: "SF Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
-    Courier, monospace;
-  font-size: 0.8125rem;
-  line-height: 1.4rem;
-  color: #2b2b2b;
-  letter-spacing: -0.005rem;
-}
-.art-article pre code {
-  background: none;
-  color: inherit;
-  font: inherit;
-  padding: 0;
 }
 
 /* ─── Section divider (h2 inside .art-article) ───────────── */
