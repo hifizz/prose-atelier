@@ -1,0 +1,147 @@
+/* ============================================================
+ *  Code block chrome + Shiki dual-theme integration.
+ *
+ *  Owned by app/_codeblock. Imported once from app/_article/article.css
+ *  so any article picks it up automatically. Designed to overwrite the
+ *  bare-bones <pre> rule in article.css when Shiki is wired up.
+ * ============================================================ */
+
+.cb-block {
+  position: relative;
+  margin: 0.75rem 0;
+  padding: 1rem 1.125rem;
+  border-radius: 0.625rem;
+  overflow-x: auto;
+  font-family: "SF Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+    Courier, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.4rem;
+  letter-spacing: -0.005rem;
+  /* Shiki sets per-token color/bg via CSS variables. The block's own bg
+     is set by .shiki below so the dual-theme switch picks up the right
+     surface tone. */
+}
+.cb-block code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  display: block;
+  /* Lines are <span class="line"> in Shiki's output; let them flow as
+     block-level so transformer effects (focus dim, line highlight) work. */
+}
+.cb-block .line {
+  display: block;
+  padding: 0 0.75rem;
+  margin: 0 -0.75rem;
+}
+.cb-block .line.empty::after {
+  /* Keep blank lines selectable. */
+  content: " ";
+}
+
+/* ─── Optional language badge in the top-right corner ─── */
+.cb-block[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.625rem;
+  font-family: "SF Mono", monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* ─── Dual-theme switch (Shiki dual-theme output) ────────
+ *  Shiki emits two sets of inline styles: light tokens and dark tokens
+ *  scoped to CSS variables. We just choose which set to read here.
+ *  Default = light. Toggle the html.dark or [data-theme="dark"] class
+ *  to opt into dark. */
+
+.cb-block .shiki,
+.cb-block.shiki {
+  background: var(--shiki-light-bg, #fdfdfc) !important;
+  color: var(--shiki-light, #2b2b2b) !important;
+}
+.cb-block .shiki span,
+.cb-block.shiki span {
+  color: var(--shiki-light, inherit);
+  /* font-style + font-weight come through from the inline style. */
+}
+
+html.dark .cb-block,
+[data-theme="dark"] .cb-block {
+  background: var(--shiki-dark-bg, #121212) !important;
+  color: var(--shiki-dark, #ddd) !important;
+}
+html.dark .cb-block span,
+[data-theme="dark"] .cb-block span {
+  color: var(--shiki-dark, inherit);
+}
+
+/* For the article template (light only), we lean on the light surface
+   directly so the block reads as soft cream regardless of the body theme. */
+.art-article .cb-block {
+  background: #f6f6f4;
+  color: #2b2b2b;
+}
+
+/* ─── Transformer styles ────────────────────────────────
+ *  These class names come from @shikijs/transformers. Style each effect
+ *  in a way that matches the editorial tone — quiet, low contrast. */
+
+/* Diff (notationDiff) */
+.cb-block .line.diff.add {
+  background: rgba(40, 167, 69, 0.08);
+}
+.cb-block .line.diff.add::before {
+  content: "+";
+  color: rgba(40, 167, 69, 0.55);
+  display: inline-block;
+  width: 1em;
+  margin-left: -0.75rem;
+}
+.cb-block .line.diff.remove {
+  background: rgba(220, 53, 69, 0.08);
+  opacity: 0.85;
+}
+.cb-block .line.diff.remove::before {
+  content: "-";
+  color: rgba(220, 53, 69, 0.55);
+  display: inline-block;
+  width: 1em;
+  margin-left: -0.75rem;
+}
+
+/* Focus (notationFocus) — dim non-focused lines */
+.cb-block.has-focused .line:not(.focused) {
+  filter: blur(0.4px);
+  opacity: 0.45;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.cb-block.has-focused:hover .line:not(.focused) {
+  filter: blur(0);
+  opacity: 0.7;
+}
+
+/* Highlight — both notation- and meta-style line highlight */
+.cb-block .line.highlighted {
+  background: rgba(0, 0, 0, 0.04);
+}
+.cb-block .line.highlighted.warning {
+  background: rgba(255, 196, 0, 0.1);
+}
+.cb-block .line.highlighted.error {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* Word highlight (notation- and meta-style) */
+.cb-block .highlighted-word {
+  background: rgba(255, 230, 100, 0.4);
+  border-radius: 0.1875rem;
+  padding: 0 0.125rem;
+  margin: 0 -0.125rem;
+}

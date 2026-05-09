@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import "./article.css";
+import "@/app/_codeblock/code-block.css";
 import { articleFontClass } from "./fonts";
 import { ArticleToc } from "./article-toc";
 
