@@ -4,6 +4,10 @@
   <img src="hero.jpeg" alt="article-template homepage" width="900" />
 </p>
 
+<p align="center">
+  <img src="live-demo.png" alt="article-template live demo" width="900" />
+</p>
+
 A Next.js project where you drop a `.mdx` file in `content/`, run `pnpm dev`,
 and get a fully-rendered editorial article — typography, left-rail TOC,
 Shiki-tokenized code with copy + auto-collapse, Mermaid diagrams. No
