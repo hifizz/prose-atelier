@@ -1,0 +1,19 @@
+/* Minimal reset. The article template owns its own typography under
+   .art-root — globals only handle the page-level reset. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}

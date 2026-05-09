@@ -1,0 +1,114 @@
+---
+title: Example article
+date: 9 May, 2026
+---
+
+import { ArticleLayout, Demo } from "@/app/_article";
+import { TickingDot } from "./demos";
+
+export const tagline = (
+  <>
+    A working demo of the article template — editorial typography, left-rail TOC,
+    embedded interactive demos, all driven by a single <code>page.mdx</code> file.
+  </>
+);
+
+export default function MDXLayout({ children }) {
+  return (
+    <ArticleLayout meta={{ ...meta, tagline }}>
+      {children}
+    </ArticleLayout>
+  );
+}
+
+This page is one MDX file. The frontmatter at the top fills the header (title +
+date). The `tagline` JSX export fills the subtitle. Everything below this
+paragraph is regular prose that flows down a single ~36rem column, with the
+table of contents pinned to the left rail at large viewports.
+
+The point of the template is that you get to write *prose*, not JSX. Headings
+are `## like this`. Links are `[like this](https://example.com)`. Code lives in
+fenced blocks. The only place you reach for components is when embedding a live
+demo inside a section.
+
+## How to add a new article
+
+Create `app/<slug>/page.mdx`. Mirror the frontmatter + default-export pattern
+from this file. If your article has interactive bits, put them in a sibling
+`demos.tsx` marked `"use client"` and import them at the top of the MDX file.
+
+```mdx
+---
+title: My article
+date: 9 May, 2026
+---
+
+import { ArticleLayout, Demo } from "@/app/_article";
+import { MyDemo } from "./demos";
+
+export const tagline = <>One sentence subtitle.</>;
+export default ({ children }) => (
+  <ArticleLayout meta={{ ...meta, tagline }}>{children}</ArticleLayout>
+);
+
+Body prose...
+
+## A section heading
+
+<Demo theme="dark" caption={<>Caption text.</>} tag="optional-tag">
+  <MyDemo />
+</Demo>
+```
+
+## Section dividers come for free
+
+Every `## h2` becomes a horizontal divider with the heading text inlined on the
+line, *and* an entry in the left TOC sidebar. Active-section tracking is
+handled by an IntersectionObserver in `app/_article/article-toc.tsx`, so it
+just works as you scroll. There's nothing to register.
+
+The TOC is hidden under 1100px. The article column itself stays centered at all
+widths.
+
+## Embedding a live demo
+
+The `<Demo>` primitive wraps your component in a dark (or light) card with a
+caption underneath. Drop in any client component:
+
+<Demo
+  theme="dark"
+  caption={<><b>Ticking dot.</b> A trivially simple SVG that updates every animation frame, just so this section has something moving in it.</>}
+  tag="rAF"
+>
+  <TickingDot />
+</Demo>
+
+If your demo needs to render its *own* frame (e.g. when interactive controls
+need to sit outside the dark card), skip `<Demo>` and compose the lower-level
+primitives yourself: `<div className="art-demo">` with a `<div
+className="art-demo-frame">` inside, plus a manual `<div
+className="art-demo-caption">` underneath. That's what the Liveline stress-test
+demo does in the original playground page.
+
+## Fenced code
+
+Plain `<pre>` blocks inherit the muted "soft cream" treatment without any
+syntax highlighter. If you want highlighting later, install a rehype plugin
+(shiki, prism, starry-night, whatever) and wire it into `next.config.ts` next
+to `rehype-slug`. The template doesn't ship with one because everyone has their
+own taste.
+
+```ts
+import { ArticleLayout } from "@/app/_article";
+
+export const meta = {
+  title: "Hello",
+  date: "1 Jan, 2026",
+};
+```
+
+---
+
+That's it. Three files per article: `page.mdx`, `demos.tsx`, and any
+article-specific CSS you need (rare). The shared template lives entirely under
+`app/_article/`.
