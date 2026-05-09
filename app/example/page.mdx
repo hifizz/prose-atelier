@@ -174,11 +174,10 @@ return (
 
 ## Fenced code
 
-Plain `<pre>` blocks inherit the muted soft-cream treatment without any
-syntax highlighter. If you want highlighting later, install a rehype plugin
-(shiki, prism, starry-night, whatever) and wire it into `next.config.ts` next
-to `rehype-slug`. The template doesn't ship with one because everyone has
-their own taste.
+Code blocks are tokenized at build time by Shiki (vitesse-light theme), wired
+in via `app/_codeblock`. The whole config — themes, transformers, language
+aliases — lives in one file (`rehype-shiki.mjs`) so customizing is editing
+that one file, not threading options through layers.
 
 ```ts
 import { ArticleLayout } from "@/app/_article";
@@ -189,8 +188,69 @@ export const meta = {
 };
 ```
 
+### Authoring annotations
+
+Every transformer is opt-in: nothing happens until you put a comment marker
+in the code (or a meta string after the language). Diff markers:
+
+```ts
+const stable = "still here";
+const removed = "going away"; // [!code --]
+const added = "brand new"; // [!code ++]
+```
+
+Line highlight via the meta string:
+
+```ts {2,4}
+const a = 1;
+const b = 2; // ← highlighted via {2,4}
+const c = 3;
+const d = 4; // ← highlighted via {2,4}
+```
+
+Word highlight via the meta string. Every occurrence of `useState` gets a
+soft yellow:
+
+```tsx /useState/
+import { useState } from "react";
+function Counter() {
+  const [n, setN] = useState(0);
+  return <button onClick={() => setN(n + 1)}>{n}</button>;
+}
+```
+
+Focus dims everything except the marked lines. Hover the block to see the
+dimmed lines pop back:
+
+```ts
+function quickSort(arr) {
+  if (arr.length <= 1) return arr;
+  const pivot = arr[0]; // [!code focus]
+  const left = arr.slice(1).filter((x) => x < pivot); // [!code focus]
+  const right = arr.slice(1).filter((x) => x >= pivot); // [!code focus]
+  return [...quickSort(left), pivot, ...quickSort(right)];
+}
+```
+
+Error / warning level annotations get a soft red / amber strip:
+
+```ts
+fetch("/api/things")
+  .then((r) => r.json())
+  .then((data) => {
+    console.log(data.naem); // [!code error] typo
+    cache.set(KEY, data); // [!code warning] no TTL
+  });
+```
+
+To customize: edit `app/_codeblock/rehype-shiki.mjs` (themes, transformer
+list, language aliases all live there as plain JS data). To copy the whole
+setup to a fresh project, see `app/_codeblock/README.md` — about 30 seconds
+of work.
+
 ---
 
 That's it. Three files per article: `page.mdx`, optional `demos.tsx` for
 client-side bits, and any article-specific CSS you need (rare). The shared
-template lives entirely under `app/_article/`.
+template lives entirely under `app/_article/` (typography + TOC) and
+`app/_codeblock/` (Shiki-powered fenced code).
