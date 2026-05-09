@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "article-template",
+  title: "Write MDX, see it live with Next.js",
   description:
     "MDX-driven editorial article template with left-rail TOC.",
 };
