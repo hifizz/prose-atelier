@@ -1,13 +1,14 @@
 # article-template
 
 A Next.js project where you drop a `.mdx` file in `content/`, run `pnpm dev`,
-and get a fully rendered editorial article — typography, left-rail TOC,
+and get a fully-rendered editorial article — typography, left-rail TOC,
 Shiki-tokenized code with copy + auto-collapse, Mermaid diagrams. No
 boilerplate per file.
 
-Inspired by the typography of [benji.org/liveline](https://benji.org/liveline).
 The reusable rendering pipeline lives in `app/_mdx/` as a single vendorable
 folder; copy it into any new Next.js project and you get the same experience.
+
+→ For the design rationale and implementation details, see [DESIGN.md](./DESIGN.md).
 
 ## Quick start
 
@@ -17,11 +18,12 @@ pnpm dev
 ```
 
 Open <http://localhost:3090>. The index links to `/example`, which is rendered
-from `content/example.mdx` and demonstrates every primitive.
+from `content/example.mdx` and exercises every primitive (typography, lists,
+demos, Shiki, Mermaid).
 
 ## Add an article
 
-Drop a file in `content/`:
+Drop a file under `content/`:
 
 ```bash
 echo '---
@@ -41,19 +43,118 @@ Visit `/my-article`. That's it — no imports, no `default export`, no
 
 Subdirectories work too: `content/series/part-1.mdx` → `/series/part-1`.
 
-## What you get for free
+### Frontmatter shape
 
-- **Editorial typography** — Inter sans + Newsreader serif italic, soft cream
-  surfaces, scoped under `.art-root`.
-- **Left-rail TOC** — auto-built from `## h2` headings, IntersectionObserver
-  active-section tracking, hidden under 1100px.
-- **Code blocks** — Shiki dual-theme tokenization (vitesse-light / -dark),
-  full transformer set (diff, focus, line/word highlight, error/warning),
-  language label + copy button + auto-collapse on tall blocks.
-- **Mermaid diagrams** — fenced ` ```mermaid ` blocks render as SVG via the
-  `mermaid` library (dynamic-imported, zero kb cost when unused).
-- **Frontmatter knobs** — `title`, `date`, `tagline`, `back: { href, label }`,
-  `toc: { label } | false`.
+```yaml
+title: My article             # required
+date: 9 May, 2026             # optional, displayed above the title
+tagline: One sentence subtitle.   # optional, plain text
+back:                         # optional, defaults to { href: "/", label: "← back" }
+  href: /
+  label: ← /article-template
+toc:                          # optional, defaults to { label: "Contents" }
+  label: Sections
+# toc: false                  # disables the TOC entirely
+```
+
+### Markdown features
+
+| Feature | How |
+|---|---|
+| Headings | `## h2` becomes a section divider + TOC entry. `### h3` is a sub-heading (no line, not in TOC). |
+| Lists / blockquote / em / strong | Plain Markdown. |
+| Inline code | `` `code` `` |
+| Code blocks | ` ```ts ` — Shiki tokens with header (lang label + copy) and auto-collapse on tall blocks. |
+| Mermaid | ` ```mermaid ` — rendered client-side as SVG. |
+| Custom React components | Reference by name (e.g. `<TickingDot />`); register in `app/[...slug]/page.tsx`. |
+
+### Code block annotations
+
+All Shiki transformers are on. Use them via comment markers in the code:
+
+````md
+```ts
+const a = 1;
+const b = 2; // [!code highlight]
+const c = 3; // [!code ++]
+const d = 4; // [!code --]
+const e = 5; // [!code focus]
+const f = 6; // [!code error]
+const g = 7; // [!code warning]
+const h = 8; // [!code word:hello]
+```
+````
+
+Or via the meta string after the language:
+
+````md
+```ts {1,3-5}     # highlight lines 1, 3-5
+```ts /word/      # highlight every "word"
+````
+
+## Add an interactive React component
+
+Components must be registered in `app/[...slug]/page.tsx` (the runtime
+model can't `import` from inside MDX). The simplest pattern: put the
+component in `app/_demos/` and the catchall route picks it up via
+`import * as demos from "@/app/_demos"`.
+
+```tsx
+// app/_demos/my-counter.tsx
+"use client";
+import { useState } from "react";
+
+export function MyCounter() {
+  const [n, setN] = useState(0);
+  return <button onClick={() => setN(n + 1)}>{n}</button>;
+}
+```
+
+```tsx
+// app/_demos/index.tsx
+export * from "./my-counter";
+```
+
+Then any `content/*.mdx` can use it by name:
+
+```mdx
+## A live demo
+
+<MyCounter />
+```
+
+## Customize
+
+Single-file knobs (the most common edits):
+
+| Want to change | Edit |
+|---|---|
+| Shiki theme / transformers / language aliases | `app/_mdx/rehype-shiki.mjs` |
+| Article colors / spacing / typography | `app/_mdx/article.css` (--art-* CSS variables) |
+| Fonts | `app/_mdx/fonts.ts` |
+| Code block chrome (header, copy, expand threshold) | `app/_mdx/code-block.tsx` |
+| Mermaid theme | `app/_mdx/mermaid-block.tsx` |
+| What components MDX files can use | `app/[...slug]/page.tsx` (extend `components`) |
+| Where content lives | `app/[...slug]/page.tsx` (`CONTENT_DIR` constant) |
+
+## Reuse in another Next.js project
+
+`app/_mdx/` is a self-contained vendorable folder. Drop it into another
+project + a catchall route + a content directory:
+
+```bash
+cp -r article-template/app/_mdx       new-project/app/_mdx
+cp -r article-template/app/[...slug]  new-project/app/[...slug]
+mkdir -p new-project/content
+
+cd new-project
+pnpm add next-mdx-remote rehype-slug \
+  @shikijs/rehype @shikijs/transformers shiki \
+  unist-util-visit mermaid
+```
+
+About 30 seconds. See `app/_mdx/README.md` for per-folder details and
+`DESIGN.md` for the design rationale.
 
 ## Project layout
 
@@ -67,62 +168,10 @@ app/
 └── globals.css           page-level reset
 content/
 └── example.mdx           a working article exercising every primitive
+DESIGN.md                 design + implementation walkthrough
+README.md                 this file
 ```
 
-The point of separating `app/_mdx/` and `app/_demos/`: the former is
-*generic*, vendorable as-is into any project. The latter is *project-specific*
-React components that each particular project's articles want to call by
-name. The catchall route at `app/[...slug]/page.tsx` is the integration
-seam — it imports both and hands them to the renderer.
+## License
 
-## Customize
-
-Single-file knobs (the most common edits):
-
-| Want to change | Edit |
-|---|---|
-| Shiki theme / transformers / language aliases | `app/_mdx/rehype-shiki.mjs` |
-| Article colors / spacing / typography | `app/_mdx/article.css` |
-| Fonts | `app/_mdx/fonts.ts` |
-| Code block chrome (header, copy, expand threshold) | `app/_mdx/code-block.tsx` |
-| Mermaid theme | `app/_mdx/mermaid-block.tsx` |
-| What components MDX files can use | `app/[...slug]/page.tsx` (extend `components`) |
-| Where content lives | `app/[...slug]/page.tsx` (CONTENT_DIR constant) |
-
-The renderer (`app/_mdx/renderer.tsx`) plumbs frontmatter →
-`<ArticleLayout>` and rehype plugins into `compileMDX`. It's the only
-place to touch to restructure the pipeline itself.
-
-## Reuse in another Next.js project
-
-`app/_mdx/` is designed to be vendorable. Drop it into another project + a
-catchall route + a content directory and you have the same experience:
-
-```bash
-cp -r article-template/app/_mdx       new-project/app/_mdx
-cp -r article-template/app/[...slug]  new-project/app/[...slug]
-mkdir -p new-project/content
-pnpm add next-mdx-remote rehype-slug \
-  @shikijs/rehype @shikijs/transformers shiki \
-  unist-util-visit mermaid
-```
-
-See `app/_mdx/README.md` for the per-folder details.
-
-## Tradeoffs worth knowing
-
-- **Runtime MDX, not compile-time.** We use `next-mdx-remote/rsc` instead of
-  `@next/mdx`. SSG via `generateStaticParams` makes the runtime cost zero —
-  every article becomes a static HTML page at build time. The win is no
-  per-file boilerplate (no imports / no default export).
-- **TOC is client-side.** Scans the DOM after mount instead of pre-extracting
-  at build. Simple + decoupled, costs a one-frame FOUC.
-- **Components are whitelisted.** Since MDX files have no imports in the
-  runtime model, any component an article wants to use must be registered in
-  `app/[...slug]/page.tsx`. This is a feature for safety + a friction tax for
-  one-off components.
-- **Mermaid loads ~2MB on first diagram.** Dynamic-imported per-page, so
-  articles without diagrams stay light.
-- **Light mode only.** Dark-mode CSS exists but no toggle is wired up — drop
-  in `next-themes` or your own theme switcher and the existing
-  `[data-theme="dark"]` selectors take over.
+MIT — see [LICENSE](./LICENSE).
