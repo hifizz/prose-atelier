@@ -17,27 +17,33 @@
   font-size: 0.8125rem;
   line-height: 1.4rem;
   letter-spacing: -0.005rem;
-  /* Shiki sets per-token color/bg via CSS variables. The block's own bg
-     is set by .shiki below so the dual-theme switch picks up the right
-     surface tone. */
+  /* Override Shiki's inline `background-color: #ffffff` on <pre> with
+     the article's soft surface. !important is necessary — inline styles
+     would beat any non-!important rule. */
+  background: #f6f6f4 !important;
+  color: #2b2b2b;
 }
 .cb-block code {
+  display: block;
   background: none;
   border: 0;
   padding: 0;
   font: inherit;
   color: inherit;
-  display: block;
-  /* Lines are <span class="line"> in Shiki's output; let them flow as
-     block-level so transformer effects (focus dim, line highlight) work. */
+  /* Critical: collapse the literal "\n" text nodes BETWEEN line spans so
+     they don't add an extra blank line between every code line. Each
+     .line below restores `pre` for its own contents. */
+  white-space: normal;
 }
 .cb-block .line {
   display: block;
+  white-space: pre;
+  min-height: 1.4rem;
   padding: 0 0.75rem;
   margin: 0 -0.75rem;
 }
-.cb-block .line.empty::after {
-  /* Keep blank lines selectable. */
+.cb-block .line:empty::after {
+  /* Keep blank lines tall + selectable. */
   content: " ";
 }
 
@@ -55,38 +61,24 @@
   pointer-events: none;
 }
 
-/* ─── Dual-theme switch (Shiki dual-theme output) ────────
- *  Shiki emits two sets of inline styles: light tokens and dark tokens
- *  scoped to CSS variables. We just choose which set to read here.
- *  Default = light. Toggle the html.dark or [data-theme="dark"] class
- *  to opt into dark. */
-
-.cb-block .shiki,
-.cb-block.shiki {
-  background: var(--shiki-light-bg, #fdfdfc) !important;
-  color: var(--shiki-light, #2b2b2b) !important;
-}
-.cb-block .shiki span,
-.cb-block.shiki span {
-  color: var(--shiki-light, inherit);
-  /* font-style + font-weight come through from the inline style. */
-}
+/* ─── Dark-mode switch (Shiki dual-theme output) ─────────
+ *  Shiki writes light-theme tokens as INLINE styles (`color: ...` on each
+ *  span, `background-color: ...` on the <pre>) and dark-theme tokens as
+ *  CSS variables (`--shiki-dark`, `--shiki-dark-bg`). To switch to dark,
+ *  consume the CSS variables — that's enough to override the inline
+ *  light-theme styles.
+ *
+ *  Light mode is the default and uses the inline styles directly, with
+ *  the .cb-block bg above overriding Shiki's white surface. */
 
 html.dark .cb-block,
 [data-theme="dark"] .cb-block {
   background: var(--shiki-dark-bg, #121212) !important;
-  color: var(--shiki-dark, #ddd) !important;
+  color: var(--shiki-dark, #ddd);
 }
 html.dark .cb-block span,
 [data-theme="dark"] .cb-block span {
-  color: var(--shiki-dark, inherit);
-}
-
-/* For the article template (light only), we lean on the light surface
-   directly so the block reads as soft cream regardless of the body theme. */
-.art-article .cb-block {
-  background: #f6f6f4;
-  color: #2b2b2b;
+  color: var(--shiki-dark) !important;
 }
 
 /* ─── Transformer styles ────────────────────────────────
