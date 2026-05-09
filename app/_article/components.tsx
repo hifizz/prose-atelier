@@ -66,7 +66,7 @@ function H2({ id, children, ...rest }: ComponentProps<"h2">) {
   );
 }
 
-function HR(_: ComponentProps<"hr">) {
+function HR() {
   return <hr className="art-divider-dots" role="separator" />;
 }
 

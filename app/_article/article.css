@@ -228,6 +228,43 @@
   background: var(--art-bg);
 }
 
+/* h3 — lighter sub-heading inside an h2 section. No line. */
+.art-article h3 {
+  margin: 0.75rem 0 -0.25rem;
+  padding: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.25rem;
+  color: var(--art-text-strong);
+  scroll-margin-top: 5rem;
+}
+
+/* blockquote — serif italic, muted, with a thin left rule. */
+.art-article blockquote {
+  margin: 0;
+  padding: 0 0 0 1rem;
+  border-left: 2px solid var(--art-line);
+}
+.art-article blockquote p {
+  font-family: var(--font-article-serif), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 430;
+  font-size: 0.9375rem;
+  letter-spacing: 0.005rem;
+  line-height: 1.4rem;
+  color: var(--art-text-soft);
+}
+
+/* Images — full column width, soft corners. */
+.art-article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5rem 0;
+  border-radius: 0.5rem;
+}
+
 /* ─── Dotted divider (override <hr />) ───────────────────── */
 .art-divider-dots {
   position: relative;
