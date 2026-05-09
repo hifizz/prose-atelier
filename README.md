@@ -1,13 +1,13 @@
 # article-template
 
-An MDX-driven editorial article template. Editorial muted typography, a fixed
-left-rail TOC that auto-tracks the visible section, and a `<Demo>` primitive
-for embedding interactive React components inside the prose.
+A Next.js project where you drop a `.mdx` file in `content/`, run `pnpm dev`,
+and get a fully rendered editorial article — typography, left-rail TOC,
+Shiki-tokenized code with copy + auto-collapse, Mermaid diagrams. No
+boilerplate per file.
 
-Originally extracted from
-[playground.zilin.im](https://github.com/zilin/playground.zilin.im) and
-inspired by the typography of
-[benji.org/liveline](https://benji.org/liveline).
+Inspired by the typography of [benji.org/liveline](https://benji.org/liveline).
+The reusable rendering pipeline lives in `app/_mdx/` as a single vendorable
+folder; copy it into any new Next.js project and you get the same experience.
 
 ## Quick start
 
@@ -16,82 +16,113 @@ pnpm install
 pnpm dev
 ```
 
-Open http://localhost:3090 — the index links to `/example`, which is itself a
-single `app/example/page.mdx` file demonstrating every primitive.
+Open <http://localhost:3090>. The index links to `/example`, which is rendered
+from `content/example.mdx` and demonstrates every primitive.
 
 ## Add an article
 
-Create `app/<slug>/page.mdx`:
+Drop a file in `content/`:
 
-```mdx
----
+```bash
+echo '---
 title: My article
 date: 9 May, 2026
+tagline: One sentence subtitle.
 ---
 
-import { ArticleLayout, Demo } from "@/app/_article";
-import { MyDemo } from "./demos";
-
-export const tagline = <>One sentence subtitle.</>;
-export default ({ children }) => (
-  <ArticleLayout meta={{ ...meta, tagline }}>{children}</ArticleLayout>
-);
-
-Body prose...
+# Body prose...
 
 ## A section heading
-
-<Demo theme="dark" caption={<>Caption text.</>} tag="optional-tag">
-  <MyDemo />
-</Demo>
+' > content/my-article.mdx
 ```
 
-If the article has interactive bits, put them in a sibling `app/<slug>/demos.tsx`
-marked `"use client"`.
+Visit `/my-article`. That's it — no imports, no `default export`, no
+`<ArticleLayout>` wrapping.
 
-## What's in the template
+Subdirectories work too: `content/series/part-1.mdx` → `/series/part-1`.
+
+## What you get for free
+
+- **Editorial typography** — Inter sans + Newsreader serif italic, soft cream
+  surfaces, scoped under `.art-root`.
+- **Left-rail TOC** — auto-built from `## h2` headings, IntersectionObserver
+  active-section tracking, hidden under 1100px.
+- **Code blocks** — Shiki dual-theme tokenization (vitesse-light / -dark),
+  full transformer set (diff, focus, line/word highlight, error/warning),
+  language label + copy button + auto-collapse on tall blocks.
+- **Mermaid diagrams** — fenced ` ```mermaid ` blocks render as SVG via the
+  `mermaid` library (dynamic-imported, zero kb cost when unused).
+- **Frontmatter knobs** — `title`, `date`, `tagline`, `back: { href, label }`,
+  `toc: { label } | false`.
+
+## Project layout
 
 ```
-app/_article/
-├── article.css          design tokens + typography + TOC sidebar styles
-├── fonts.ts             Inter (sans) + Newsreader (italic serif)
-├── article-layout.tsx   server component: shell + header + TOC + main
-├── article-toc.tsx      client component: IntersectionObserver-based TOC
-├── components.tsx       Demo / DemoFrame / DemoCaption + MDX overrides
-└── index.ts             public exports
+app/
+├── _mdx/                 reusable MDX renderer — vendorable folder
+├── _demos/               project-specific React components for use inside MDX
+├── [...slug]/page.tsx    catchall route, walks content/ recursively, SSGs
+├── layout.tsx            root <html> shell
+├── page.tsx              project index (links to /example)
+└── globals.css           page-level reset
+content/
+└── example.mdx           a working article exercising every primitive
 ```
 
-The `mdx-components.tsx` at the project root wires the MDX overrides
-(`h2` → section divider, `hr` → dotted divider). They depend on `rehype-slug`
-auto-generating heading IDs (configured in `next.config.ts`).
+The point of separating `app/_mdx/` and `app/_demos/`: the former is
+*generic*, vendorable as-is into any project. The latter is *project-specific*
+React components that each particular project's articles want to call by
+name. The catchall route at `app/[...slug]/page.tsx` is the integration
+seam — it imports both and hands them to the renderer.
 
-Customize tokens in `app/_article/article.css` — every color and spacing value
-is a `--art-*` CSS variable on `.art-root`.
+## Customize
 
-## What it intentionally does NOT include
+Single-file knobs (the most common edits):
 
-- **Syntax highlighting.** Plain `<pre>` blocks inherit the muted cream style.
-  Add Shiki / Prism / starry-night yourself if you want highlighting — slot the
-  rehype plugin into `next.config.ts` next to `rehype-slug`.
-- **Dark mode.** The template is light-mode only. Demo frames have a `theme="dark"`
-  prop for the card-on-page contrast (mimicking dashboard chips on an editorial
-  page), but the page itself stays light.
-- **Tailwind.** Pure CSS Module-style scoped class names (`.art-*`).
-- **A CMS / blog index page.** This is a *template*, not a blog engine. If you
-  want an index, write one — each `page.mdx` is just a Next.js route.
+| Want to change | Edit |
+|---|---|
+| Shiki theme / transformers / language aliases | `app/_mdx/rehype-shiki.mjs` |
+| Article colors / spacing / typography | `app/_mdx/article.css` |
+| Fonts | `app/_mdx/fonts.ts` |
+| Code block chrome (header, copy, expand threshold) | `app/_mdx/code-block.tsx` |
+| Mermaid theme | `app/_mdx/mermaid-block.tsx` |
+| What components MDX files can use | `app/[...slug]/page.tsx` (extend `components`) |
+| Where content lives | `app/[...slug]/page.tsx` (CONTENT_DIR constant) |
+
+The renderer (`app/_mdx/renderer.tsx`) plumbs frontmatter →
+`<ArticleLayout>` and rehype plugins into `compileMDX`. It's the only
+place to touch to restructure the pipeline itself.
+
+## Reuse in another Next.js project
+
+`app/_mdx/` is designed to be vendorable. Drop it into another project + a
+catchall route + a content directory and you have the same experience:
+
+```bash
+cp -r article-template/app/_mdx       new-project/app/_mdx
+cp -r article-template/app/[...slug]  new-project/app/[...slug]
+mkdir -p new-project/content
+pnpm add next-mdx-remote rehype-slug \
+  @shikijs/rehype @shikijs/transformers shiki \
+  unist-util-visit mermaid
+```
+
+See `app/_mdx/README.md` for the per-folder details.
 
 ## Tradeoffs worth knowing
 
-- **TOC is client-side.** The TOC component scans the DOM after mount instead
-  of pre-extracting headings at build time. This keeps the template simple and
-  decoupled from the MDX pipeline. The cost: a one-frame FOUC where the sidebar
-  is empty, then populates. If you prefer a build-time TOC, you can write a
-  custom rehype plugin that exports headings as a named export from each MDX
-  file and consume that in `<ArticleLayout>` — search "rehype toc" for prior
-  art.
-- **Plugins as strings, not imports, in `next.config.ts`.** Required by
-  Turbopack (the default in Next 16) — loader options must be serializable.
-  This is why `next.config.ts` doesn't import plugin functions directly.
-- **Fonts via `next/font/google`.** Switch to local fonts by editing
-  `app/_article/fonts.ts`. The CSS variables `--font-article-sans` and
-  `--font-article-serif` are what `article.css` consumes.
+- **Runtime MDX, not compile-time.** We use `next-mdx-remote/rsc` instead of
+  `@next/mdx`. SSG via `generateStaticParams` makes the runtime cost zero —
+  every article becomes a static HTML page at build time. The win is no
+  per-file boilerplate (no imports / no default export).
+- **TOC is client-side.** Scans the DOM after mount instead of pre-extracting
+  at build. Simple + decoupled, costs a one-frame FOUC.
+- **Components are whitelisted.** Since MDX files have no imports in the
+  runtime model, any component an article wants to use must be registered in
+  `app/[...slug]/page.tsx`. This is a feature for safety + a friction tax for
+  one-off components.
+- **Mermaid loads ~2MB on first diagram.** Dynamic-imported per-page, so
+  articles without diagrams stay light.
+- **Light mode only.** Dark-mode CSS exists but no toggle is wired up — drop
+  in `next-themes` or your own theme switcher and the existing
+  `[data-theme="dark"]` selectors take over.
