@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 
 import { ArticleLayout, type ArticleMeta } from "./article-layout";
 import { articleMdxComponents } from "./components";
@@ -39,6 +40,12 @@ export async function MDXArticle({
       mdxOptions: {
         // Functions are fine here — runtime MDX, no Turbopack
         // serialization constraint to worry about.
+        remarkPlugins: [
+          // GFM enables tables, task lists, strikethrough, autolinks —
+          // all common in AI-tool reply content and rendered standardly
+          // across all themes.
+          remarkGfm,
+        ],
         rehypePlugins: [
           rehypeSlug,
           // rehypeCustomBlocks must run BEFORE Shiki — it routes
