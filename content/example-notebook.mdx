@@ -1,0 +1,95 @@
+---
+title: 工具调用：让大模型走出沙箱
+date: 2026 年 4 月 26 日 · 约 8 分钟
+tagline: Function Calling、MCP、ReAct —— 三种工具调用范式的来龙去脉。
+back:
+  href: /
+  label: ← Build an Agent
+theme: notebook
+---
+
+ChatGPT 刚出来时，大家最常吐槽的一件事是：它不知道今天几号。
+
+这不是 bug，是设计 —— 模型的知识在训练时被冻结，它无法访问实时信息、无法修改外部状态、甚至连一个简单的数学计算都可能算错。换句话说，它生活在一个 *沙箱* 里。
+
+工具调用（Tool Use）就是给沙箱开窗户。让模型在需要的时候，能向外面发起一次请求，拿回结果，再继续推理。
+
+## 三种范式
+
+工具调用并不是一个新概念，但它在 LLM 时代经历了三次范式演进。
+
+### 1. 自由文本解析（2022）
+
+最早期的做法朴素到家：让模型用自然语言描述它想做什么，然后写正则表达式去解析。
+
+```python
+prompt = "如果你需要查询天气，输出 [WEATHER:城市名]"
+response = llm.generate(prompt + user_query)
+match = re.search(r'\[WEATHER:(.+?)\]', response)
+```
+
+这种做法脆弱、容易出错 —— 模型偶尔会忘了格式、加引号、写错字段。但它能跑，是 [LangChain](https://www.langchain.com/) 早期版本的核心机制之一。
+
+### 2. Function Calling（2023）
+
+OpenAI 在 2023 年引入了 Function Calling —— 模型不再输出文本，而是输出结构化的 JSON：
+
+```json
+{
+  "tool_use": {
+    "name": "get_weather",
+    "input": { "city": "北京", "date": "2026-05-08" }
+  }
+}
+```
+
+这是工程化的一大步。**结构化** 意味着可解析、可验证、可类型检查。
+
+### 3. MCP（2024）
+
+但 Function Calling 有一个尴尬的地方：每接一个新工具，都要在自己的代码里手动注册一遍。
+
+> Model Context Protocol（MCP）解决的就是这个问题 —— 让工具像 USB 设备一样，插上就能用。
+
+MCP 把工具的「声明」和「实现」分离：服务方只要按 MCP 协议暴露自己的能力，任何兼容 MCP 的客户端都能直接调用。
+
+## 一个完整的调用循环
+
+不管哪种范式，一次完整的工具调用都是这四步：
+
+1. **意图判断** —— 模型读到用户问题，判断需要什么工具
+2. **参数生成** —— 模型生成符合工具签名的参数
+3. **工具执行** —— 系统拿到参数，去调用真实的 API/函数
+4. **结果回传** —— 把返回值再喂回模型，让它组织最终回答
+
+```ts
+async function runAgent(userQuery: string) {
+  let messages = [{ role: "user", content: userQuery }];
+
+  while (true) {
+    const response = await llm.chat({ messages, tools });
+
+    if (response.stop_reason === "end_turn") {
+      return response.content;
+    }
+
+    if (response.stop_reason === "tool_use") {
+      const result = await executeTool(response.tool_calls);
+      messages.push(response, result);
+    }
+  }
+}
+```
+
+这个 `while` 循环，是 Agent 跑起来的核心引擎。
+
+## 工具设计的几条经验
+
+写过几十个工具之后，我总结出几条经验：
+
+- **工具描述要写给模型看，不是写给同事看。** 别用「详见文档」这种话 —— 模型不会去翻文档。
+- **参数尽量少。** 一个工具超过 5 个参数，模型就容易犯错。该拆就拆。
+- **返回值要结构化。** 别返回大段自然语言，返回 JSON。让下一步推理有明确的字段可抓。
+- **幂等优先。** 工具最好是可重复调用且结果一致的。Agent 经常会「试探性」调用，非幂等操作会引发副作用。
+
+下一篇我们聊记忆系统 —— 当工具调用变多、对话变长，上下文窗口怎么管理。

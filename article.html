@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>工具调用：让大模型走出沙箱 · Build an Agent</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* ───────────────────────────────────────────────────────
+     基础字体设置
+     ─────────────────────────────────────────────────────── */
+  html {
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica,
+      Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, p, li { text-wrap: pretty; }
+
+
+  /* ═══════════════════════════════════════════════════════
+     .article-body —— 文章正文样式（可独立复用）
+
+     使用方式：把整段 .article-body 相关的样式抽到一个
+     article.css，<link> 引入即可。
+     依赖：仅依赖 CSS 自身，不需要任何 Tailwind 插件。
+     ═══════════════════════════════════════════════════════ */
+  .article-body {
+    font-size: 15.5px;
+    line-height: 1.8;
+    color: rgb(38 38 38);          /* neutral-800，比 prose 的 700 更扎实 */
+    word-break: break-word;
+  }
+
+  /* ─── 段落 ─── */
+  .article-body p {
+    margin: 0.3em 0;
+  }
+
+  /* ─── 标题 ─── */
+  /* h2/h3 字号收紧，让正文与标题的差距更协调，
+     字重统一 500（与首页保持一致） */
+  .article-body h2 {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: rgb(23 23 23);          /* neutral-900 */
+    margin: 1.7em 0 0.45em;
+  }
+  .article-body h3 {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: rgb(23 23 23);
+    margin: 1.35em 0 0.3em;
+  }
+
+  /* 标题紧跟在另一个标题后面时，去掉多余的上间距 */
+  .article-body h2 + h3,
+  .article-body h2:first-child,
+  .article-body h3:first-child {
+    margin-top: 0;
+  }
+
+  /* ─── 强调 ─── */
+  .article-body strong {
+    font-weight: 500;
+    color: rgb(23 23 23);
+  }
+  .article-body em {
+    font-style: normal;
+    color: rgb(23 23 23);
+    border-bottom: 1px dashed rgb(163 163 163);
+    padding-bottom: 1px;
+  }
+
+  /* ─── 列表 ─── */
+  /* 注意：Tailwind 的 preflight 默认把 ul/ol 的 list-style 重置为 none，
+     所以这里必须显式声明 list-style-type，bullet/number 才会出现 */
+  .article-body ul,
+  .article-body ol {
+    margin: 0.55em 0;
+    padding-left: 1.5em;
+  }
+  .article-body ul { list-style-type: disc; }
+  .article-body ol { list-style-type: decimal; }
+
+  .article-body li {
+    margin: 0.25em 0;
+    line-height: 1.8;
+    padding-left: 0.2em;
+  }
+  .article-body li > p {           /* 列表里嵌套段落时去掉默认 margin */
+    margin: 0.25em 0;
+  }
+  /* 列表标记色：与正文同色系，不要 prose 那种浅灰 */
+  .article-body ul > li::marker {
+    color: rgb(64 64 64);          /* neutral-700 */
+  }
+  .article-body ol > li::marker {
+    color: rgb(64 64 64);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── 行内代码（不要前后斜杠/反引号） ─── */
+  .article-body :not(pre) > code {
+    font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    font-weight: 400;
+    background: rgb(245 245 245);  /* neutral-100 */
+    color: rgb(23 23 23);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* ─── 代码块（浅色） ─── */
+  .article-body pre {
+    background: rgb(250 250 250);  /* neutral-50，几乎是白底 */
+    border: 1px solid rgb(229 229 229);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 0.875rem 1.125rem;
+    border-radius: 6px;
+    margin: 1em 0;
+    overflow-x: auto;
+  }
+  .article-body pre code {
+    font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    background: transparent;
+    color: rgb(38 38 38);
+    padding: 0;
+  }
+
+  /* ─── 引用 ─── */
+  .article-body blockquote {
+    border-left: 2px solid rgb(212 212 212);
+    padding: 0.05em 0 0.05em 1.05em;
+    margin: 1em 0;
+    color: rgb(82 82 82);          /* neutral-600 */
+  }
+  .article-body blockquote p {
+    margin: 0.4em 0;
+  }
+
+  /* ─── 链接 ─── */
+  .article-body a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(212 212 212);
+    transition: text-decoration-color 0.15s;
+  }
+  .article-body a:hover {
+    text-decoration-color: rgb(23 23 23);
+  }
+
+  /* ─── 分隔线 ─── */
+  .article-body hr {
+    border: 0;
+    border-top: 1px solid rgb(229 229 229);
+    margin: 1.75em 0;
+  }
+
+  /* ─── 图片 ─── */
+  .article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 1.25em 0;
+  }
+
+  /* ─── 表格 ─── */
+  .article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 1.25em 0;
+  }
+  .article-body th,
+  .article-body td {
+    border-bottom: 1px solid rgb(229 229 229);
+    padding: 0.55em 0.75em;
+    text-align: left;
+  }
+  .article-body th {
+    font-weight: 500;
+    color: rgb(23 23 23);
+    background: rgb(250 250 250);
+  }
+
+
+  /* ═══════════════════════════════════════════════════════
+     暗色模式
+     ═══════════════════════════════════════════════════════ */
+  @media (prefers-color-scheme: dark) {
+    .article-body {
+      color: rgb(212 212 212);     /* neutral-300 */
+    }
+    .article-body h2,
+    .article-body h3,
+    .article-body strong,
+    .article-body em {
+      color: rgb(245 245 245);     /* neutral-100 */
+    }
+    .article-body em {
+      border-bottom-color: rgb(82 82 82);
+    }
+    .article-body :not(pre) > code {
+      background: rgb(38 38 38);
+      color: rgb(245 245 245);
+    }
+    .article-body pre {
+      background: rgb(23 23 23);
+      border-color: rgb(38 38 38);
+    }
+    .article-body pre code {
+      color: rgb(212 212 212);
+    }
+    .article-body blockquote {
+      border-left-color: rgb(64 64 64);
+      color: rgb(163 163 163);
+    }
+    .article-body ul > li::marker,
+    .article-body ol > li::marker {
+      color: rgb(163 163 163);
+    }
+    .article-body a {
+      text-decoration-color: rgb(82 82 82);
+    }
+    .article-body a:hover {
+      text-decoration-color: rgb(245 245 245);
+    }
+    .article-body hr,
+    .article-body th,
+    .article-body td {
+      border-color: rgb(38 38 38);
+    }
+    .article-body th {
+      background: rgb(23 23 23);
+      color: rgb(245 245 245);
+    }
+  }
+</style>
+</head>
+<body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+
+  <article class="mx-auto max-w-2xl px-6 py-8 sm:py-12">
+
+    <!-- 顶部返回链接 -->
+    <nav class="mb-8 sm:mb-10">
+      <a href="./build-an-agent-compact.html"
+         class="inline-flex items-center gap-1.5 text-[13px] text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        <span>Build an Agent</span>
+      </a>
+    </nav>
+
+    <!-- 文章头部 -->
+    <header class="mb-7 sm:mb-8">
+      <div class="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-neutral-400 dark:text-neutral-500">
+        <span class="font-mono">03 / 7</span>
+        <span aria-hidden="true">·</span>
+        <span>2026 年 4 月 26 日</span>
+        <span aria-hidden="true">·</span>
+        <span>约 8 分钟</span>
+        <span aria-hidden="true">·</span>
+        <span>1,243 次阅读</span>
+      </div>
+
+      <h1 class="mb-3 text-[26px] font-medium leading-tight tracking-tight sm:text-[28px]">
+        工具调用：让大模型走出沙箱
+      </h1>
+
+      <p class="text-[15px] leading-[1.7] text-neutral-600 dark:text-neutral-400">
+        Function Calling、MCP、ReAct——三种工具调用范式的来龙去脉。
+      </p>
+    </header>
+
+    <hr class="border-t border-dashed border-neutral-300 dark:border-neutral-700" />
+
+    <!-- ═══ 文章正文：用 .article-body 类 ═══ -->
+    <div class="article-body my-7 sm:my-9">
+
+      <h2>一、为什么需要工具</h2>
+
+      <p>ChatGPT 刚出来时，大家最常吐槽的一件事是：它不知道今天几号。</p>
+
+      <p>这不是 bug，是设计——模型的知识在训练时被冻结，它无法访问实时信息、无法修改外部状态、甚至连一个简单的数学计算都可能算错。换句话说，它生活在一个"沙箱"里。</p>
+
+      <p>工具调用（Tool Use）就是给沙箱开窗户。让模型在需要的时候，能向外面发起一次请求，拿回结果，再继续推理。</p>
+
+      <h2>二、三种范式</h2>
+
+      <p>工具调用并不是一个新概念，但它在 LLM 时代经历了三次范式演进。</p>
+
+      <h3>1. 自由文本解析（2022）</h3>
+
+      <p>最早期的做法朴素到家：让模型用自然语言描述它想做什么，然后写正则表达式去解析。</p>
+
+<pre><code>prompt = "如果你需要查询天气，输出 [WEATHER:城市名]"
+response = llm.generate(prompt + user_query)
+match = re.search(r'\[WEATHER:(.+?)\]', response)</code></pre>
+
+      <p>这种做法脆弱、容易出错——模型偶尔会忘了格式、加引号、写错字段。但它能跑，是 <a href="#">LangChain</a> 早期版本的核心机制之一。</p>
+
+      <h3>2. Function Calling（2023）</h3>
+
+      <p>OpenAI 在 2023 年 6 月引入了 Function Calling——模型不再输出文本，而是输出结构化的 JSON：</p>
+
+<pre><code>{
+  "tool_use": {
+    "name": "get_weather",
+    "input": { "city": "北京", "date": "2026-05-08" }
+  }
+}</code></pre>
+
+      <p>这是工程化的一大步。结构化意味着可解析、可验证、可类型检查。Anthropic 的 Tool Use、Google 的 Function Calling、OpenAI 的 Tools API——本质都是这套范式。</p>
+
+      <h3>3. MCP（2024）</h3>
+
+      <p>但 Function Calling 有一个尴尬的地方：每接一个新工具，你都要在自己的代码里手动注册一遍。如果一个 Agent 要用 50 个工具，那就是 50 段胶水代码。</p>
+
+      <blockquote>
+        <p>Model Context Protocol（MCP）解决的就是这个问题——让工具像 USB 设备一样，插上就能用。</p>
+      </blockquote>
+
+      <p>MCP 把工具的"声明"和"实现"分离：服务方只要按 MCP 协议暴露自己的能力，任何兼容 MCP 的客户端都能直接调用，不需要重新对接。</p>
+
+      <h2>三、一个完整的调用循环</h2>
+
+      <p>不管哪种范式，一次完整的工具调用都是这四步：</p>
+
+      <ol>
+        <li><strong>意图判断</strong>——模型读到用户问题，判断需要什么工具</li>
+        <li><strong>参数生成</strong>——模型生成符合工具签名的参数</li>
+        <li><strong>工具执行</strong>——系统拿到参数，去调用真实的 API/函数</li>
+        <li><strong>结果回传</strong>——把返回值再喂回模型，让它组织最终回答</li>
+      </ol>
+
+<pre><code>async function runAgent(userQuery) {
+  let messages = [{ role: "user", content: userQuery }];
+
+  while (true) {
+    const response = await llm.chat({ messages, tools });
+
+    if (response.stop_reason === "end_turn") {
+      return response.content;
+    }
+
+    if (response.stop_reason === "tool_use") {
+      const result = await executeTool(response.tool_calls);
+      messages.push(response, result);
+    }
+  }
+}</code></pre>
+
+      <p>这个 <code>while</code> 循环，是 Agent 跑起来的核心引擎。</p>
+
+      <h2>四、工具设计的几条经验</h2>
+
+      <p>写过几十个工具之后，我总结出几条经验：</p>
+
+      <ul>
+        <li><strong>工具描述要写给模型看，不是写给同事看。</strong>别用"详见文档"这种话——模型不会去翻文档。把上下文、边界、典型用法都写进 <code>description</code> 里。</li>
+        <li><strong>参数尽量少。</strong>一个工具超过 5 个参数，模型就容易犯错。该拆就拆。</li>
+        <li><strong>返回值要结构化。</strong>别返回大段自然语言，返回 JSON。让下一步推理有明确的字段可抓。</li>
+        <li><strong>幂等优先。</strong>工具最好是可重复调用且结果一致的。Agent 经常会"试探性"调用，非幂等操作会引发副作用。</li>
+      </ul>
+
+      <p>下一篇我们聊记忆系统——当工具调用变多、对话变长，上下文窗口怎么管理。</p>
+
+    </div>
+
+    <hr class="border-t border-dashed border-neutral-300 dark:border-neutral-700" />
+
+    <!-- 上一篇 / 下一篇 -->
+    <nav class="mt-2 grid grid-cols-1 divide-y divide-dashed divide-neutral-300 sm:mt-0 sm:grid-cols-2 sm:divide-x sm:divide-y-0 dark:divide-neutral-700">
+
+      <a href="#02" class="group block py-5 transition-colors sm:pr-6">
+        <div class="mb-1.5 flex items-center gap-1.5 text-[12px] text-neutral-400 dark:text-neutral-500">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>上一篇 · 02 / 7</span>
+        </div>
+        <h4 class="text-[14px] font-medium leading-snug text-neutral-700 transition-colors group-hover:text-neutral-900 dark:text-neutral-300 dark:group-hover:text-neutral-100">
+          Agent 的解剖学：四个不可拆的部件
+        </h4>
+      </a>
+
+      <a href="#04" class="group block py-5 transition-colors sm:pl-6 sm:text-right">
+        <div class="mb-1.5 flex items-center justify-start gap-1.5 text-[12px] text-neutral-400 sm:justify-end dark:text-neutral-500">
+          <span>下一篇 · 04 / 7</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+        <h4 class="text-[14px] font-medium leading-snug text-neutral-700 transition-colors group-hover:text-neutral-900 dark:text-neutral-300 dark:group-hover:text-neutral-100">
+          记忆系统：短期上下文与长期向量库
+        </h4>
+      </a>
+
+    </nav>
+
+  </article>
+
+</body>
+</html>

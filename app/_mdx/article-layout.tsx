@@ -57,7 +57,7 @@ export function ArticleLayout({
   const tocCfg =
     theme === "notebook" || theme === "chat" || meta.toc === false
       ? null
-      : meta.toc ?? {};
+      : (meta.toc ?? {});
 
   if (theme === "notebook") {
     return (
@@ -82,18 +82,15 @@ export function ArticleLayout({
   if (theme === "chat") {
     const density: ArticleDensity = meta.density ?? "md";
     return (
-      <div
-        className={`${articleFontClass} art-chat`}
-        data-density={density}
-      >
+      <div className={`${articleFontClass} art-chat`} data-density={density}>
         <main className="art-container">
+          <DensityTabs />
           <Link href={back.href} className="art-back" aria-label="Back">
             {back.label ?? "← back"}
           </Link>
 
           {/* Sits in the layout chrome — outside .art-article — so the
               article's typography rules don't bleed into the control. */}
-          <DensityTabs />
 
           {(meta.date || meta.title || meta.tagline) && (
             <header className="art-header">

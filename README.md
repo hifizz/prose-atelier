@@ -63,7 +63,18 @@ back:                         # optional, defaults to { href: "/", label: "← b
 toc:                          # optional, defaults to { label: "Contents" }
   label: Sections
 # toc: false                  # disables the TOC entirely
+theme: editorial              # optional: "editorial" (default) | "notebook"
 ```
+
+### Themes
+
+Two visual styles ship in the template — pick per-article via `theme:` in
+frontmatter:
+
+| `theme: editorial` (default) | `theme: notebook` |
+|---|---|
+| Magazine layout. Fixed left-rail TOC. `##` headings render as a thin horizontal divider with a small floating label. `_em_` becomes serif italic. Best for English long-form essays. | Single-column tech-blog feel. No TOC. `##` headings are inline, `_em_` becomes a dashed underline (CJK-friendly), neutral grayscale palette. Best for Chinese / shorter posts. |
+| Demo: [/example](./content/example.mdx) | Demo: [/example-notebook](./content/example-notebook.mdx) |
 
 ### Markdown features
 

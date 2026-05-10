@@ -1,0 +1,280 @@
+/* ═══════════════════════════════════════════════════════════════
+   article.css
+
+   Build an Agent 专题文章正文样式。
+   独立文件，零依赖——不需要 Tailwind、不需要任何 CSS 框架。
+
+   用法：
+     <link rel="stylesheet" href="/path/to/article.css" />
+     <article class="article-body">
+       <!-- markdown 渲染出的 HTML 直接放这里 -->
+     </article>
+
+   颜色取自 Tailwind neutral 调色板（真灰，零蓝调）：
+     neutral-50  #fafafa     neutral-600  #525252
+     neutral-100 #f5f5f5     neutral-700  #404040
+     neutral-200 #e5e5e5     neutral-800  #262626
+     neutral-300 #d4d4d4     neutral-900  #171717
+     neutral-400 #a3a3a3
+     neutral-500 #737373
+
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── 容器基础 ─── */
+.article-body {
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica,
+        Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgb(38 38 38); /* neutral-800 */
+    word-break: break-word;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.article-body :where(h1, h2, h3, h4, p, li) {
+    text-wrap: pretty;
+}
+
+/* ─── 段落 ─── */
+.article-body p {
+    margin: 0.3em 0;
+}
+
+/* ─── 标题 ─── */
+/* 字重统一 500，与极简首页保持一致；
+   字号 h2=20 / h3=17 / 正文=16，递进克制 */
+.article-body h2 {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: rgb(23 23 23); /* neutral-900 */
+    margin: 1.7em 0 0.45em;
+}
+
+.article-body h3 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: rgb(23 23 23);
+    margin: 1.35em 0 0.3em;
+}
+
+/* 标题紧跟另一标题或在容器开头时，去掉多余上间距 */
+.article-body h2 + h3,
+.article-body h2:first-child,
+.article-body h3:first-child {
+    margin-top: 0;
+}
+
+/* ─── 强调 ─── */
+.article-body strong {
+    font-weight: 500;
+    color: rgb(23 23 23);
+}
+
+/* 中文不用 italic，改成虚线下划线作为强调 */
+.article-body em {
+    font-style: normal;
+    color: rgb(23 23 23);
+    border-bottom: 1px dashed rgb(163 163 163);
+    padding-bottom: 1px;
+}
+
+/* ─── 列表 ─── */
+/* 注意：如果上游有 CSS reset（如 Tailwind 的 preflight）
+   把 list-style 重置为 none，这两行 list-style-type 必不可少 */
+.article-body ul,
+.article-body ol {
+    margin: 0.55em 0;
+    padding-left: 1.5em;
+}
+
+.article-body ul {
+    list-style-type: disc;
+}
+.article-body ol {
+    list-style-type: decimal;
+}
+
+.article-body li {
+    margin: 0.25em 0;
+    line-height: 1.8;
+    padding-left: 0.2em;
+}
+
+.article-body li > p {
+    margin: 0.25em 0;
+}
+
+/* 标记色与正文同色系，不要浅灰 */
+.article-body ul > li::marker {
+    color: rgb(64 64 64); /* neutral-700 */
+}
+
+.article-body ol > li::marker {
+    color: rgb(64 64 64);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── 行内代码 ─── */
+/* 不用反引号包裹，浅灰底色 + pill 圆角 */
+.article-body :not(pre) > code {
+    font-family:
+        ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    font-weight: 400;
+    background: rgb(245 245 245); /* neutral-100 */
+    color: rgb(23 23 23);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+/* ─── 代码块 ─── */
+.article-body pre {
+    background: rgb(250 250 250); /* neutral-50，几乎贴白底 */
+    border: 1px solid rgb(229 229 229);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 0.875rem 1.125rem;
+    border-radius: 6px;
+    margin: 1em 0;
+    overflow-x: auto;
+}
+
+.article-body pre code {
+    font-family:
+        ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    background: transparent;
+    color: rgb(38 38 38);
+    padding: 0;
+}
+
+/* ─── 引用 ─── */
+.article-body blockquote {
+    border-left: 2px solid rgb(212 212 212);
+    padding: 0.05em 0 0.05em 1.05em;
+    margin: 1em 0;
+    color: rgb(82 82 82); /* neutral-600 */
+}
+
+.article-body blockquote p {
+    margin: 0.4em 0;
+}
+
+/* ─── 链接 ─── */
+.article-body a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(212 212 212);
+    transition: text-decoration-color 0.15s;
+}
+
+.article-body a:hover {
+    text-decoration-color: rgb(23 23 23);
+}
+
+/* ─── 分隔线 ─── */
+.article-body hr {
+    border: 0;
+    border-top: 1px solid rgb(229 229 229);
+    margin: 1.75em 0;
+}
+
+/* ─── 图片 ─── */
+.article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 1.25em 0;
+}
+
+/* ─── 表格 ─── */
+.article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 1.25em 0;
+}
+
+.article-body th,
+.article-body td {
+    border-bottom: 1px solid rgb(229 229 229);
+    padding: 0.55em 0.75em;
+    text-align: left;
+}
+
+.article-body th {
+    font-weight: 500;
+    color: rgb(23 23 23);
+    background: rgb(250 250 250);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   暗色模式（跟随系统设置）
+   ═══════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+    .article-body {
+        color: rgb(212 212 212); /* neutral-300 */
+    }
+
+    .article-body h2,
+    .article-body h3,
+    .article-body strong,
+    .article-body em {
+        color: rgb(245 245 245); /* neutral-100 */
+    }
+
+    .article-body em {
+        border-bottom-color: rgb(82 82 82);
+    }
+
+    .article-body :not(pre) > code {
+        background: rgb(38 38 38);
+        color: rgb(245 245 245);
+    }
+
+    .article-body pre {
+        background: rgb(23 23 23);
+        border-color: rgb(38 38 38);
+    }
+
+    .article-body pre code {
+        color: rgb(212 212 212);
+    }
+
+    .article-body blockquote {
+        border-left-color: rgb(64 64 64);
+        color: rgb(163 163 163);
+    }
+
+    .article-body ul > li::marker,
+    .article-body ol > li::marker {
+        color: rgb(163 163 163);
+    }
+
+    .article-body a {
+        text-decoration-color: rgb(82 82 82);
+    }
+
+    .article-body a:hover {
+        text-decoration-color: rgb(245 245 245);
+    }
+
+    .article-body hr,
+    .article-body th,
+    .article-body td {
+        border-color: rgb(38 38 38);
+    }
+
+    .article-body th {
+        background: rgb(23 23 23);
+        color: rgb(245 245 245);
+    }
+}
