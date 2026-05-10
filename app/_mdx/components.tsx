@@ -1,6 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
 import type { MDXComponents } from "mdx/types";
 
+import { DensityTabs } from "./density-tabs";
+
 /* ============================================================
  *  Public primitives — usable inside MDX or any TSX page.
  * ============================================================ */
@@ -80,4 +82,5 @@ export const articleMdxComponents: MDXComponents = {
   Demo,
   DemoFrame,
   DemoCaption,
+  DensityTabs,
 };

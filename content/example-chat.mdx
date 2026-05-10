@@ -1,13 +1,15 @@
 ---
 title: "重构数据加载层（AI 回复样例）"
 date: "2026 · 05 · 10"
-tagline: "演示 chat 主题的 normal 密度排版 — 适合 AI coding 工具的回复内容。把 frontmatter 改成 density: compact 即可切换紧凑模式。"
+tagline: "演示 chat 主题的四档字号 — 适合 AI coding 工具的回复内容。点击下面的 XS / SM / MD / LG 可以实时切换。"
 theme: chat
-density: normal
+density: md
 back:
   href: "/"
   label: "← 回首页"
 ---
+
+<DensityTabs />
 
 我先说结论：**当前的数据加载层在三个地方有重复**，统一掉之后不仅代码量会少 40%，还能顺便修掉那个偶发的竞态。下面是分析、实现步骤和验证结果。
 

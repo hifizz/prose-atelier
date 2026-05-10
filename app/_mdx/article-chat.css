@@ -3,19 +3,30 @@
  *
  *  "Chat" article theme — tuned for AI-coding-tool reply content:
  *  long Chinese prose, lots of lists, mixed code blocks, tool
- *  outputs. Two densities, switched by the `data-density` attribute
- *  the layout sets from `density` frontmatter.
+ *  outputs.
+ *
+ *  Density is a 4-step scale, switched by the `data-density`
+ *  attribute the layout sets from `density` frontmatter (or by
+ *  the <DensityTabs /> client component at runtime):
+ *
+ *    xs — 12px body, very compact (skim mode)
+ *    sm — 14px body, normal-tight
+ *    md — 16px body, default for AI replies
+ *    lg — 18px body, large / accessibility
  *
  *  Activate via frontmatter:
  *    theme: chat
- *    density: compact   # or normal (default)
+ *    density: md   # xs | sm | md | lg, default md
  *
- *  Density is purely a token override — no rule duplication —
- *  so adding new selectors costs nothing in the compact path.
+ *  ── Token entity ──
+ *  All sizes are CSS custom properties on .art-chat. The four
+ *  density blocks below are the only place per-size values live —
+ *  every selector elsewhere reads from a token, so adding new
+ *  rules costs nothing in the other density paths.
  * ============================================================ */
 
 .art-chat {
-  /* ── Palette ── */
+  /* ── Palette (density-independent) ── */
   --ch-bg: #ffffff;
   --ch-text: rgb(38 38 38);
   --ch-text-strong: rgb(23 23 23);
@@ -28,26 +39,6 @@
   --ch-surface-soft: rgb(250 250 250);
   --ch-accent: rgb(37 99 235);
   --ch-accent-soft: rgba(37, 99, 235, 0.08);
-
-  /* ── Typography tokens (normal density) ── */
-  --ch-font-size: 15px;
-  --ch-line-height: 1.75;
-  --ch-block-gap: 0.75em;       /* between paragraphs / blocks */
-  --ch-section-gap: 1.6em;      /* before h2 */
-  --ch-subsection-gap: 1.2em;   /* before h3 */
-  --ch-list-gap: 0.3em;         /* between list items */
-  --ch-list-pad: 1.5em;         /* list indent */
-  --ch-h1-size: 26px;
-  --ch-h2-size: 19px;
-  --ch-h3-size: 16px;
-  --ch-h4-size: 15px;
-  --ch-code-pad: 0.875rem 1.125rem;
-  --ch-code-font-size: 13px;
-  --ch-code-line-height: 1.55;
-  --ch-fig-margin: 0.85em;
-  --ch-container-pad-y: 2.75rem;
-  --ch-container-pad-y-lg: 3.5rem;
-  --ch-container-max: 44rem;
 
   position: relative;
   min-height: 100vh;
@@ -63,25 +54,108 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Compact density: tighten everything via tokens ── */
-.art-chat[data-density="compact"] {
-  --ch-font-size: 14px;
+/* ── Density tokens — the only per-size config in the file. ──
+   md is the default; if no data-density is set, it applies via
+   .art-chat:not([data-density]) so the cascade still works. */
+.art-chat:not([data-density]),
+.art-chat[data-density="md"] {
+  --ch-font-size: 16px;
+  --ch-line-height: 1.75;
+  --ch-block-gap: 0.75em;
+  --ch-section-gap: 1.6em;
+  --ch-subsection-gap: 1.2em;
+  --ch-list-gap: 0.3em;
+  --ch-list-pad: 1.5em;
+  --ch-h1-size: 26px;
+  --ch-h2-size: 20px;
+  --ch-h3-size: 17px;
+  --ch-h4-size: 16px;
+  --ch-code-font-size: 14px;
+  --ch-code-line-height: 1.55;
+  --ch-code-pad: 0.85em 1.1em;
+  --ch-fig-margin: 0.85em;
+  --ch-container-pad-y: 2.75rem;
+  --ch-container-pad-y-lg: 3.5rem;
+  --ch-container-max: 44rem;
+  --ch-meta-size: 13px;
+  --ch-tagline-size: 14px;
+  --ch-table-font-size: 14px;
+  --ch-table-pad: 0.5em 0.75em;
+}
+
+.art-chat[data-density="xs"] {
+  --ch-font-size: 12px;
   --ch-line-height: 1.55;
   --ch-block-gap: 0.4em;
-  --ch-section-gap: 1.05em;
-  --ch-subsection-gap: 0.8em;
+  --ch-section-gap: 1em;
+  --ch-subsection-gap: 0.75em;
   --ch-list-gap: 0.1em;
-  --ch-list-pad: 1.3em;
+  --ch-list-pad: 1.2em;
+  --ch-h1-size: 18px;
+  --ch-h2-size: 14px;
+  --ch-h3-size: 13px;
+  --ch-h4-size: 12px;
+  --ch-code-font-size: 11px;
+  --ch-code-line-height: 1.4;
+  --ch-code-pad: 0.5em 0.7em;
+  --ch-fig-margin: 0.4em;
+  --ch-container-pad-y: 1.25rem;
+  --ch-container-pad-y-lg: 1.75rem;
+  --ch-container-max: 38rem;
+  --ch-meta-size: 11px;
+  --ch-tagline-size: 12px;
+  --ch-table-font-size: 11.5px;
+  --ch-table-pad: 0.25em 0.5em;
+}
+
+.art-chat[data-density="sm"] {
+  --ch-font-size: 14px;
+  --ch-line-height: 1.65;
+  --ch-block-gap: 0.55em;
+  --ch-section-gap: 1.3em;
+  --ch-subsection-gap: 0.95em;
+  --ch-list-gap: 0.2em;
+  --ch-list-pad: 1.4em;
   --ch-h1-size: 22px;
   --ch-h2-size: 17px;
   --ch-h3-size: 15px;
   --ch-h4-size: 14px;
-  --ch-code-pad: 0.6rem 0.875rem;
   --ch-code-font-size: 12.5px;
-  --ch-code-line-height: 1.4;
-  --ch-fig-margin: 0.5em;
-  --ch-container-pad-y: 1.75rem;
-  --ch-container-pad-y-lg: 2.25rem;
+  --ch-code-line-height: 1.5;
+  --ch-code-pad: 0.7em 0.95em;
+  --ch-fig-margin: 0.6em;
+  --ch-container-pad-y: 2rem;
+  --ch-container-pad-y-lg: 2.5rem;
+  --ch-container-max: 41rem;
+  --ch-meta-size: 12px;
+  --ch-tagline-size: 13px;
+  --ch-table-font-size: 13px;
+  --ch-table-pad: 0.4em 0.65em;
+}
+
+.art-chat[data-density="lg"] {
+  --ch-font-size: 18px;
+  --ch-line-height: 1.8;
+  --ch-block-gap: 0.85em;
+  --ch-section-gap: 1.85em;
+  --ch-subsection-gap: 1.4em;
+  --ch-list-gap: 0.35em;
+  --ch-list-pad: 1.6em;
+  --ch-h1-size: 30px;
+  --ch-h2-size: 23px;
+  --ch-h3-size: 19px;
+  --ch-h4-size: 18px;
+  --ch-code-font-size: 15.5px;
+  --ch-code-line-height: 1.6;
+  --ch-code-pad: 1em 1.25em;
+  --ch-fig-margin: 1em;
+  --ch-container-pad-y: 3.25rem;
+  --ch-container-pad-y-lg: 4rem;
+  --ch-container-max: 48rem;
+  --ch-meta-size: 14px;
+  --ch-tagline-size: 16px;
+  --ch-table-font-size: 15.5px;
+  --ch-table-pad: 0.55em 0.85em;
 }
 
 .art-chat :where(h1, h2, h3, h4, p, li) {
@@ -94,16 +168,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   color: var(--ch-text-faint);
-  font-size: 13px;
+  font-size: var(--ch-meta-size);
   font-weight: 460;
   text-decoration: none;
   transition: color 0.15s ease;
-}
-.art-chat[data-density="compact"] .art-back {
-  margin-bottom: 1rem;
-  font-size: 12.5px;
 }
 .art-chat .art-back:hover {
   color: var(--ch-text-strong);
@@ -128,18 +198,13 @@
 .art-chat .art-header {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding-bottom: 1.25rem;
+  gap: 0.4em;
+  padding-bottom: 0.9em;
   border-bottom: 1px dashed var(--ch-line-soft);
-  margin-bottom: 1.5rem;
-}
-.art-chat[data-density="compact"] .art-header {
-  gap: 0.3rem;
-  padding-bottom: 0.85rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1em;
 }
 .art-chat .art-header .art-meta {
-  font-size: 12.5px;
+  font-size: var(--ch-meta-size);
   color: var(--ch-text-fainter);
   letter-spacing: 0.01em;
 }
@@ -153,7 +218,7 @@
 }
 .art-chat .art-header .art-tagline {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--ch-tagline-size);
   line-height: 1.6;
   color: var(--ch-text-soft);
   max-width: 36rem;
@@ -320,9 +385,6 @@
 .art-chat .art-article .cb-block .line {
   min-height: var(--ch-code-line-height);
 }
-.art-chat[data-density="compact"] .art-article .cb-header {
-  padding: 0.25rem 0.5rem 0.2rem 0.75rem;
-}
 
 /* ── Blockquote ── */
 .art-chat .art-article blockquote {
@@ -369,9 +431,6 @@
   margin: 1.25em 0;
   border-radius: 0;
 }
-.art-chat[data-density="compact"] .art-divider-dots {
-  margin: 0.85em 0;
-}
 .art-chat .art-divider-dots::before,
 .art-chat .art-divider-dots::after {
   content: none;
@@ -390,22 +449,15 @@
 .art-chat .art-article table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13.5px;
+  font-size: var(--ch-table-font-size);
   margin: var(--ch-block-gap) 0;
-}
-.art-chat[data-density="compact"] .art-article table {
-  font-size: 13px;
 }
 .art-chat .art-article th,
 .art-chat .art-article td {
   border-bottom: 1px solid var(--ch-line);
-  padding: 0.45em 0.7em;
+  padding: var(--ch-table-pad);
   text-align: left;
   line-height: 1.5;
-}
-.art-chat[data-density="compact"] .art-article th,
-.art-chat[data-density="compact"] .art-article td {
-  padding: 0.3em 0.55em;
 }
 .art-chat .art-article th {
   font-weight: 600;
@@ -417,4 +469,67 @@
 .art-chat ::selection {
   background: var(--ch-accent-soft);
   color: var(--ch-text-strong);
+}
+
+/* ── Density tabs (the <DensityTabs /> client component) ──
+   Sized in absolute units so it stays put while the article body
+   scales around it; that makes "before" and "after" obvious when
+   the user clicks. */
+.art-chat-density-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0.4rem;
+  background: var(--ch-surface-soft);
+  border: 1px solid var(--ch-line);
+  border-radius: 0.625rem;
+  font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas,
+    monospace;
+}
+.art-chat-density-tabs__group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  flex: 1;
+}
+.art-chat-density-tabs__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--ch-text-soft);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease, color 0.12s ease,
+    border-color 0.12s ease;
+}
+.art-chat-density-tabs__btn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--ch-text-strong);
+}
+.art-chat-density-tabs__btn[data-active] {
+  background: #ffffff;
+  color: var(--ch-text-strong);
+  border-color: var(--ch-line);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+.art-chat-density-tabs__name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.art-chat-density-tabs__size {
+  font-size: 10.5px;
+  color: var(--ch-text-faint);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.art-chat-density-tabs__btn[data-active] .art-chat-density-tabs__size {
+  color: var(--ch-accent);
 }

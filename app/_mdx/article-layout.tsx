@@ -20,10 +20,17 @@ import { ArticleToc } from "./article-toc";
         dashed-underline <em> (CJK-friendly), no TOC.
      - "chat" — tuned for AI-coding-tool reply content: dense lists,
         mixed code blocks, tool outputs, CJK-friendly. Pair with
-        `density: "compact" | "normal"` (default: normal).
+        `density` to pick a body size.
+
+   `density` is the chat theme's 4-step typography scale (see
+   article-chat.css for the per-step token values):
+     xs — 12px body, very compact (skim mode)
+     sm — 14px body, normal-tight
+     md — 16px body, default for AI replies   ← fallback
+     lg — 18px body, large / accessibility
 */
 export type ArticleTheme = "editorial" | "notebook" | "chat";
-export type ArticleDensity = "compact" | "normal";
+export type ArticleDensity = "xs" | "sm" | "md" | "lg";
 
 export type ArticleMeta = {
   title: string;
@@ -32,7 +39,7 @@ export type ArticleMeta = {
   back?: { href: string; label?: string };
   toc?: { label?: string } | false;
   theme?: ArticleTheme;
-  /* Only meaningful for theme: "chat". Defaults to "normal". */
+  /* Only meaningful for theme: "chat". Defaults to "md". */
   density?: ArticleDensity;
 };
 
@@ -72,7 +79,7 @@ export function ArticleLayout({
   }
 
   if (theme === "chat") {
-    const density: ArticleDensity = meta.density ?? "normal";
+    const density: ArticleDensity = meta.density ?? "md";
     return (
       <div
         className={`${articleFontClass} art-chat`}
