@@ -195,19 +195,17 @@ export default function Index() {
                   "0 1px 0 rgba(255,255,255,0.4) inset, 0 10px 24px -12px rgba(31,27,22,0.55)",
               }}
             >
-              See the live demo
+              Editorial demo
               <span aria-hidden>→</span>
             </Link>
-            <a
-              href="https://github.com/hifizz/mdx-article-template#readme"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/example-notebook"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.85rem 1.25rem",
-                background: "rgba(255,255,255,0.6)",
+                padding: "0.85rem 1.4rem",
+                background: "rgba(255,255,255,0.85)",
                 color: INK,
                 borderRadius: 999,
                 textDecoration: "none",
@@ -217,17 +215,58 @@ export default function Index() {
                 backdropFilter: "blur(8px)",
               }}
             >
-              Read the README
-            </a>
-            <span
+              Notebook demo
+              <span aria-hidden>→</span>
+            </Link>
+            <Link
+              href="/example-chat"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.85rem 1.4rem",
+                background: "rgba(255,255,255,0.85)",
+                color: INK,
+                borderRadius: 999,
+                textDecoration: "none",
+                fontSize: "0.95rem",
+                fontWeight: 500,
+                border: `1px solid ${HAIRLINE}`,
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              Chat demo
+              <span
+                aria-hidden
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 500,
+                  color: ACCENT,
+                  padding: "0.1rem 0.45rem",
+                  borderRadius: 999,
+                  background: "rgba(168, 90, 31, 0.1)",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                NEW
+              </span>
+              <span aria-hidden>→</span>
+            </Link>
+            <a
+              href="https://github.com/hifizz/mdx-article-template#readme"
+              target="_blank"
+              rel="noreferrer"
               style={{
                 fontSize: "0.85rem",
                 color: INK_FAINT,
                 marginLeft: "0.25rem",
+                textDecoration: "underline",
+                textDecorationColor: HAIRLINE,
+                textUnderlineOffset: 4,
               }}
             >
-              MIT licensed · zero per-file boilerplate
-            </span>
+              Read the README
+            </a>
           </div>
         </section>
 
@@ -332,8 +371,7 @@ export default function Index() {
 }
 
 const codeInline: React.CSSProperties = {
-  fontFamily:
-    "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace",
+  fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace",
   fontSize: "0.92em",
   padding: "0.1em 0.4em",
   borderRadius: 6,
