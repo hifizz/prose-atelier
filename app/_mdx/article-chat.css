@@ -164,6 +164,15 @@
   display: block;
 }
 
+/* Editorial article.css sets `.art-article p, .art-article li` to
+   1rem / 1.6 unconditionally — that leaks into the chat theme and
+   defeats the density override. Force inheritance from .art-chat. */
+.art-chat .art-article p,
+.art-chat .art-article li {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: 0;
+}
 .art-chat .art-article p {
   margin: var(--ch-block-gap) 0;
   color: var(--ch-text);
