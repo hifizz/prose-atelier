@@ -1,0 +1,411 @@
+/* ============================================================
+ *  article-chat.css
+ *
+ *  "Chat" article theme — tuned for AI-coding-tool reply content:
+ *  long Chinese prose, lots of lists, mixed code blocks, tool
+ *  outputs. Two densities, switched by the `data-density` attribute
+ *  the layout sets from `density` frontmatter.
+ *
+ *  Activate via frontmatter:
+ *    theme: chat
+ *    density: compact   # or normal (default)
+ *
+ *  Density is purely a token override — no rule duplication —
+ *  so adding new selectors costs nothing in the compact path.
+ * ============================================================ */
+
+.art-chat {
+  /* ── Palette ── */
+  --ch-bg: #ffffff;
+  --ch-text: rgb(38 38 38);
+  --ch-text-strong: rgb(23 23 23);
+  --ch-text-soft: rgb(82 82 82);
+  --ch-text-faint: rgb(115 115 115);
+  --ch-text-fainter: rgb(163 163 163);
+  --ch-line: rgb(229 229 229);
+  --ch-line-soft: rgb(212 212 212);
+  --ch-surface: rgb(245 245 245);
+  --ch-surface-soft: rgb(250 250 250);
+  --ch-accent: rgb(37 99 235);
+  --ch-accent-soft: rgba(37, 99, 235, 0.08);
+
+  /* ── Typography tokens (normal density) ── */
+  --ch-font-size: 15px;
+  --ch-line-height: 1.75;
+  --ch-block-gap: 0.75em;       /* between paragraphs / blocks */
+  --ch-section-gap: 1.6em;      /* before h2 */
+  --ch-subsection-gap: 1.2em;   /* before h3 */
+  --ch-list-gap: 0.3em;         /* between list items */
+  --ch-list-pad: 1.5em;         /* list indent */
+  --ch-h1-size: 26px;
+  --ch-h2-size: 19px;
+  --ch-h3-size: 16px;
+  --ch-h4-size: 15px;
+  --ch-code-pad: 0.875rem 1.125rem;
+  --ch-code-font-size: 13px;
+  --ch-code-line-height: 1.55;
+  --ch-fig-margin: 0.85em;
+  --ch-container-pad-y: 2.75rem;
+  --ch-container-pad-y-lg: 3.5rem;
+  --ch-container-max: 44rem;
+
+  position: relative;
+  min-height: 100vh;
+  background: var(--ch-bg);
+  color: var(--ch-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  font-size: var(--ch-font-size);
+  line-height: var(--ch-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Compact density: tighten everything via tokens ── */
+.art-chat[data-density="compact"] {
+  --ch-font-size: 14px;
+  --ch-line-height: 1.55;
+  --ch-block-gap: 0.4em;
+  --ch-section-gap: 1.05em;
+  --ch-subsection-gap: 0.8em;
+  --ch-list-gap: 0.1em;
+  --ch-list-pad: 1.3em;
+  --ch-h1-size: 22px;
+  --ch-h2-size: 17px;
+  --ch-h3-size: 15px;
+  --ch-h4-size: 14px;
+  --ch-code-pad: 0.6rem 0.875rem;
+  --ch-code-font-size: 12.5px;
+  --ch-code-line-height: 1.4;
+  --ch-fig-margin: 0.5em;
+  --ch-container-pad-y: 1.75rem;
+  --ch-container-pad-y-lg: 2.25rem;
+}
+
+.art-chat :where(h1, h2, h3, h4, p, li) {
+  text-wrap: pretty;
+}
+
+/* ── Inline back link ── */
+.art-chat .art-back {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 1.5rem;
+  color: var(--ch-text-faint);
+  font-size: 13px;
+  font-weight: 460;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.art-chat[data-density="compact"] .art-back {
+  margin-bottom: 1rem;
+  font-size: 12.5px;
+}
+.art-chat .art-back:hover {
+  color: var(--ch-text-strong);
+}
+
+/* ── Container ── */
+.art-chat .art-container {
+  position: relative;
+  max-width: var(--ch-container-max);
+  margin: 0 auto;
+  padding: var(--ch-container-pad-y) 1.5rem
+    calc(var(--ch-container-pad-y) + 1rem);
+}
+@media (min-width: 640px) {
+  .art-chat .art-container {
+    padding: var(--ch-container-pad-y-lg) 1.5rem
+      calc(var(--ch-container-pad-y-lg) + 1rem);
+  }
+}
+
+/* ── Header ── */
+.art-chat .art-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px dashed var(--ch-line-soft);
+  margin-bottom: 1.5rem;
+}
+.art-chat[data-density="compact"] .art-header {
+  gap: 0.3rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 1rem;
+}
+.art-chat .art-header .art-meta {
+  font-size: 12.5px;
+  color: var(--ch-text-fainter);
+  letter-spacing: 0.01em;
+}
+.art-chat .art-header h1 {
+  margin: 0;
+  font-size: var(--ch-h1-size);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+  color: var(--ch-text-strong);
+}
+.art-chat .art-header .art-tagline {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ch-text-soft);
+  max-width: 36rem;
+}
+
+/* ── Article body ── */
+.art-chat .art-article {
+  display: block;
+}
+
+.art-chat .art-article p {
+  margin: var(--ch-block-gap) 0;
+  color: var(--ch-text);
+}
+.art-chat .art-article p:first-child {
+  margin-top: 0;
+}
+
+/* H2 — section heading. AI replies often use h2 to label phases
+   like "分析"/"实现"/"验证"; treat as a structural beat. */
+.art-chat .art-article h2 {
+  position: static;
+  height: auto;
+  background: transparent;
+  font-size: var(--ch-h2-size);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: var(--ch-text-strong);
+  margin: var(--ch-section-gap) 0 0.4em;
+  scroll-margin-top: 4rem;
+}
+.art-chat .art-article h2 > span {
+  position: static;
+  display: inline;
+  padding: 0;
+  background: transparent;
+  transform: none;
+}
+
+.art-chat .art-article h3 {
+  margin: var(--ch-subsection-gap) 0 0.3em;
+  font-size: var(--ch-h3-size);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0;
+  color: var(--ch-text-strong);
+  scroll-margin-top: 4rem;
+}
+.art-chat .art-article h4 {
+  margin: 0.9em 0 0.25em;
+  font-size: var(--ch-h4-size);
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ch-text-strong);
+}
+
+.art-chat .art-article h2 + h3,
+.art-chat .art-article h2:first-child,
+.art-chat .art-article h3:first-child,
+.art-chat .art-article h4:first-child {
+  margin-top: 0;
+}
+
+/* ── Emphasis ── */
+.art-chat .art-article strong {
+  font-weight: 600;
+  color: var(--ch-text-strong);
+}
+.art-chat .art-article em,
+.art-chat .art-article p em,
+.art-chat .art-article li em {
+  font-family: inherit;
+  font-style: normal;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: 0;
+  color: var(--ch-text-strong);
+  border-bottom: 1px dashed var(--ch-text-fainter);
+  padding-bottom: 1px;
+}
+
+/* ── Lists — the centerpiece of AI replies ── */
+.art-chat .art-article ul,
+.art-chat .art-article ol {
+  display: block;
+  margin: var(--ch-block-gap) 0;
+  padding: 0 0 0 var(--ch-list-pad);
+  gap: 0;
+}
+.art-chat .art-article ul {
+  list-style-type: disc;
+}
+.art-chat .art-article ol {
+  list-style-type: decimal;
+}
+.art-chat .art-article li {
+  margin: var(--ch-list-gap) 0;
+  padding-left: 0.2em;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: var(--ch-line-height);
+  letter-spacing: 0;
+  color: var(--ch-text);
+}
+.art-chat .art-article li > p {
+  margin: var(--ch-list-gap) 0;
+}
+.art-chat .art-article li > ul,
+.art-chat .art-article li > ol {
+  margin: var(--ch-list-gap) 0;
+}
+.art-chat .art-article ul > li::marker {
+  color: var(--ch-text-faint);
+}
+.art-chat .art-article ol > li::marker {
+  color: var(--ch-text-faint);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* GitHub-style task list checkboxes — common in AI replies. */
+.art-chat .art-article li.task-list-item {
+  list-style: none;
+  margin-left: -1.2em;
+  padding-left: 0.2em;
+}
+.art-chat .art-article li.task-list-item > input[type="checkbox"] {
+  margin-right: 0.45em;
+  vertical-align: -1px;
+}
+
+/* ── Inline code ── */
+.art-chat .art-article :not(pre) > code {
+  font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas,
+    monospace;
+  font-size: 0.88em;
+  font-weight: 400;
+  background: var(--ch-surface);
+  color: var(--ch-text-strong);
+  padding: 1px 5px;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+/* ── Code block figure — tighten in compact density ── */
+.art-chat .art-article .cb-figure {
+  margin: var(--ch-fig-margin) 0;
+}
+.art-chat .art-article .cb-block {
+  padding: var(--ch-code-pad);
+  font-size: var(--ch-code-font-size);
+  line-height: var(--ch-code-line-height);
+}
+.art-chat .art-article .cb-block .line {
+  min-height: var(--ch-code-line-height);
+}
+.art-chat[data-density="compact"] .art-article .cb-header {
+  padding: 0.25rem 0.5rem 0.2rem 0.75rem;
+}
+
+/* ── Blockquote ── */
+.art-chat .art-article blockquote {
+  margin: var(--ch-block-gap) 0;
+  padding: 0.05em 0 0.05em 1em;
+  border-left: 2px solid var(--ch-line-soft);
+}
+.art-chat .art-article blockquote p {
+  margin: 0.3em 0;
+  font-family: inherit;
+  font-style: normal;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.65;
+  letter-spacing: 0;
+  color: var(--ch-text-soft);
+}
+
+/* ── Links ── */
+.art-chat .art-article a {
+  position: static;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ch-line-soft);
+  border: 0;
+  padding: 0;
+  transition: text-decoration-color 0.15s ease;
+}
+.art-chat .art-article a:hover {
+  color: var(--ch-text-strong);
+  text-decoration-color: var(--ch-text-strong);
+  border: 0;
+}
+
+/* ── HR — neutralize editorial dotted divider ── */
+.art-chat .art-divider-dots {
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: 0;
+  border-top: 1px dashed var(--ch-line-soft);
+  margin: 1.25em 0;
+  border-radius: 0;
+}
+.art-chat[data-density="compact"] .art-divider-dots {
+  margin: 0.85em 0;
+}
+.art-chat .art-divider-dots::before,
+.art-chat .art-divider-dots::after {
+  content: none;
+}
+
+/* ── Images ── */
+.art-chat .art-article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: var(--ch-block-gap) 0;
+  border-radius: 4px;
+}
+
+/* ── Tables ── */
+.art-chat .art-article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  margin: var(--ch-block-gap) 0;
+}
+.art-chat[data-density="compact"] .art-article table {
+  font-size: 13px;
+}
+.art-chat .art-article th,
+.art-chat .art-article td {
+  border-bottom: 1px solid var(--ch-line);
+  padding: 0.45em 0.7em;
+  text-align: left;
+  line-height: 1.5;
+}
+.art-chat[data-density="compact"] .art-article th,
+.art-chat[data-density="compact"] .art-article td {
+  padding: 0.3em 0.55em;
+}
+.art-chat .art-article th {
+  font-weight: 600;
+  color: var(--ch-text-strong);
+  background: var(--ch-surface-soft);
+}
+
+/* ── Selection ── */
+.art-chat ::selection {
+  background: var(--ch-accent-soft);
+  color: var(--ch-text-strong);
+}

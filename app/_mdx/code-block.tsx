@@ -22,10 +22,25 @@ type Props = ComponentProps<"pre"> & {
   "data-lang"?: string;
 };
 
+/* Languages we treat as "tool output" — rendered as a muted no-syntax-color
+   panel with an OUTPUT label instead of the usual language chip. Useful for
+   AI replies that paste terminal logs, stdout dumps, etc. */
+const OUTPUT_LANGS = new Set([
+  "output",
+  "console",
+  "stdout",
+  "stderr",
+  "terminal",
+  "shell-output",
+  "bash-output",
+  "log",
+]);
+
 export function CodeBlock(props: Props) {
   const { className = "", children, ...rest } = props;
   const lang = extractLanguage(className) ?? props["data-lang"];
   const copyText = props["data-content"] ?? "";
+  const isOutput = !!lang && OUTPUT_LANGS.has(lang.toLowerCase());
 
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -64,7 +79,11 @@ export function CodeBlock(props: Props) {
   const collapsed = tooTall && !expanded;
 
   return (
-    <figure className="cb-figure" data-collapsed={collapsed || undefined}>
+    <figure
+      className="cb-figure"
+      data-collapsed={collapsed || undefined}
+      data-output={isOutput || undefined}
+    >
       <header className="cb-header">
         <span className="cb-lang">{lang || ""}</span>
         <button

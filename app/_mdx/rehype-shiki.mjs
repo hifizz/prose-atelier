@@ -63,6 +63,17 @@ const languageAlias = {
   sh: "bash",
   zsh: "bash",
   shell: "bash",
+  /* Tool / terminal output — rendered by code-block.tsx as a muted
+     "OUTPUT" panel. Aliased to `text` so Shiki still produces the
+     standard line structure but with no syntax coloring. */
+  output: "text",
+  console: "text",
+  stdout: "text",
+  stderr: "text",
+  terminal: "text",
+  log: "text",
+  "shell-output": "text",
+  "bash-output": "text",
 };
 
 /* ─── The plugin ─────────────────────────────────────────────────────────

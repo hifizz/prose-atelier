@@ -218,6 +218,45 @@ html.dark .cb-figure[data-collapsed] .cb-body::after,
   );
 }
 
+/* ─── Output variant — terminal logs, stdout dumps, tool replies ─── */
+.cb-figure[data-output] {
+  background: #fafaf9;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.cb-figure[data-output] .cb-header {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+.cb-figure[data-output] .cb-lang {
+  color: rgba(0, 0, 0, 0.42);
+  letter-spacing: 0.04em;
+}
+.cb-figure[data-output] .cb-block {
+  color: rgba(0, 0, 0, 0.78);
+  font-size: 0.78125rem;
+}
+/* Strip Shiki token colors inside output blocks — output isn't code. */
+.cb-figure[data-output] .cb-block span {
+  color: inherit !important;
+}
+
+html.dark .cb-figure[data-output],
+[data-theme="dark"] .cb-figure[data-output] {
+  background: #1a1a1a;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+html.dark .cb-figure[data-output] .cb-header,
+[data-theme="dark"] .cb-figure[data-output] .cb-header {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+html.dark .cb-figure[data-output] .cb-block,
+[data-theme="dark"] .cb-figure[data-output] .cb-block {
+  color: rgba(255, 255, 255, 0.82);
+}
+html.dark .cb-figure[data-output] .cb-block span,
+[data-theme="dark"] .cb-figure[data-output] .cb-block span {
+  color: inherit !important;
+}
+
 /* ─── Transformer styles (notation diff / focus / highlight / words) ─── */
 .cb-block .line.diff.add {
   background: rgba(40, 167, 69, 0.08);
