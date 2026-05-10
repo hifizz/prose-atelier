@@ -8,6 +8,7 @@ import "./code-block.css";
 import "./mermaid-block.css";
 import { articleFontClass } from "./fonts";
 import { ArticleToc } from "./article-toc";
+import { DensityTabs } from "./density-tabs";
 
 /* The shape of an article's frontmatter, after YAML parsing. Everything
    is optional except `title`. The renderer (renderer.tsx) extracts this
@@ -89,6 +90,10 @@ export function ArticleLayout({
           <Link href={back.href} className="art-back" aria-label="Back">
             {back.label ?? "← back"}
           </Link>
+
+          {/* Sits in the layout chrome — outside .art-article — so the
+              article's typography rules don't bleed into the control. */}
+          <DensityTabs />
 
           {(meta.date || meta.title || meta.tagline) && (
             <header className="art-header">
