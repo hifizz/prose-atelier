@@ -1,6 +1,6 @@
 {
   "name": "prose-atelier",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MDX-driven long-form content atelier — framework-agnostic core + Next.js renderer. Multiple themes (editorial / notebook / chat, more to come), Shiki code blocks, Mermaid, left-rail TOC.",
   "author": "zilin <276161014@qq.com>",
   "license": "MIT",
@@ -43,7 +43,8 @@
     "./styles.css": "./dist/styles.css",
     "./rehype-shiki": "./dist/rehype-shiki.mjs",
     "./rehype-custom-blocks": "./dist/rehype-custom-blocks.mjs",
-    "./rehype-add-copy-content": "./dist/rehype-add-copy-content.mjs"
+    "./rehype-add-copy-content": "./dist/rehype-add-copy-content.mjs",
+    "./package.json": "./package.json"
   },
   "sideEffects": [
     "**/*.css"
