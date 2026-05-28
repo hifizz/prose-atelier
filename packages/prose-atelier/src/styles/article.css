@@ -21,8 +21,12 @@
     background: var(--art-bg);
     color: var(--art-text-soft);
     font-family:
-        var(--font-article-sans),
-        "Inter",
+        /* Inner fallback inside var() is critical — if --font-article-sans
+           is undefined (non-Next consumers without next/font), a bare
+           `var(--font-article-sans)` returns empty and invalidates the
+           whole declaration, causing browser default (Times) to win.
+           With the inner fallback, the chain degrades gracefully. */
+        var(--font-article-sans, "Inter"),
         system-ui,
         -apple-system,
         "Segoe UI",
@@ -153,7 +157,7 @@
 .art-article p em strong,
 .art-article li em {
     color: var(--art-text-strong);
-    font-family: var(--font-article-serif), Georgia, "Times New Roman", serif;
+    font-family: var(--font-article-serif, Georgia), "Times New Roman", serif;
     font-style: italic;
     font-weight: 430;
     font-size: 0.9375rem;
@@ -240,7 +244,7 @@
     border-left: 2px solid var(--art-line);
 }
 .art-article blockquote p {
-    font-family: var(--font-article-serif), Georgia, "Times New Roman", serif;
+    font-family: var(--font-article-serif, Georgia), "Times New Roman", serif;
     font-style: italic;
     font-weight: 430;
     font-size: 0.9375rem;
@@ -256,6 +260,30 @@
     height: auto;
     margin: 0.5rem 0;
     border-radius: 0.5rem;
+}
+
+/* ─── Tables (GFM) ───────────────────────────────────────── */
+.art-article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 0.95em;
+    line-height: 1.55;
+}
+.art-article th,
+.art-article td {
+    padding: 0.5em 0.75em;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    vertical-align: top;
+}
+.art-article th {
+    font-weight: 600;
+    color: var(--art-text-strong);
+    border-bottom-color: rgba(0, 0, 0, 0.2);
+}
+.art-article tbody tr:hover {
+    background: rgba(0, 0, 0, 0.015);
 }
 
 /* ─── Dotted divider (override <hr />) ───────────────────── */

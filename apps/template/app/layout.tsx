@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "prose-atelier/styles.css";
 
 export const metadata: Metadata = {
   title: "Write MDX, see it live with Next.js",

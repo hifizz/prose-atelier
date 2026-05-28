@@ -8,6 +8,10 @@ node_modules
 out/
 build/
 
+# Package build artifacts
+packages/*/dist
+*.tgz
+
 # Misc
 .DS_Store
 *.pem

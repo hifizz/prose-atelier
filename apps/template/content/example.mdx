@@ -41,8 +41,8 @@ Ordinary Markdown.
 ```
 
 That's the entire boilerplate. No `import { ArticleLayout }`, no
-`export default`. The runtime renderer (`app/_mdx/renderer.tsx`) handles the
-shell, plugins, and component registration in one place.
+`export default`. The runtime renderer inside `prose-atelier` handles
+the shell, plugins, and component registration in one place.
 
 ### Optional layout knobs (all in frontmatter)
 
@@ -152,7 +152,7 @@ Each code block now ships with a header bar (language label + copy button)
 and auto-collapses if it exceeds 480px:
 
 ```ts
-import { ArticleLayout } from "@/app/_mdx";
+import { ArticleLayout } from "prose-atelier";
 
 export const meta = {
   title: "Hello",
@@ -280,12 +280,14 @@ function partial(fn, ...preset) {
 }
 ```
 
-To customize anything: see `app/_mdx/README.md`. The Shiki config (themes,
-transformers, language aliases) lives in `_mdx/rehype-shiki.mjs` as plain
-JS data — change one file, all articles update.
+To customize anything: see the `prose-atelier` README. The Shiki config
+(themes, transformers, language aliases) is exposed via the
+`prose-atelier/rehype-shiki` subpath — drop a custom rehype pipeline
+into your MDX compile step and you're done.
 
 ---
 
 That's it. Drop a `.mdx` in `content/` and you get the same shell. To copy
-this whole setup to a fresh Next.js project, see `app/_mdx/README.md` —
-about 30 seconds of work.
+this setup to a fresh Next.js project: `pnpm add prose-atelier`, import
+the stylesheet from your root layout, re-export the catchall route in one
+line. About 30 seconds of work.

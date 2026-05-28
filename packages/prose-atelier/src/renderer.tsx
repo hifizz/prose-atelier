@@ -1,32 +1,26 @@
-import type { ReactNode } from "react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
-import { ArticleLayout, type ArticleMeta } from "./article-layout";
+import { ArticleLayout } from "./article-layout";
 import { articleMdxComponents } from "./components";
 import { CodeBlock } from "./code-block";
 import { MermaidBlock } from "./mermaid-block";
 import rehypeShiki from "./rehype-shiki.mjs";
 import rehypeAddCopyContent from "./rehype-add-copy-content.mjs";
 import rehypeCustomBlocks from "./rehype-custom-blocks.mjs";
+import type { ArticleMeta, MDXArticleProps } from "./types";
 
-/* MDXArticle is the single entry point for rendering an article from
-   raw MDX source. To customize: edit this file (it's the only config
-   point). To extend with project-specific React components an article
-   can use, pass them via `components`. */
+/* MDXArticle — Next.js-only top-level renderer. Compiles a raw MDX
+   source string at request time (or at build time, depending on Next's
+   route config) and hands the result to ArticleLayout.
 
-export type MDXArticleProps = {
-  source: string;
-  /* Extra MDX components — merged in after the built-ins so callers
-     can shadow defaults (e.g. swap Demo). `any` props because each
-     project's components have their own prop shapes. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  components?: Record<string, React.ComponentType<any>>;
-  /* Override the layout entirely (e.g. for a non-article page that
-     just wants the same MDX pipeline). Defaults to ArticleLayout. */
-  layout?: (props: { meta: ArticleMeta; children: ReactNode }) => ReactNode;
-};
+   See src/types.ts §6 (MDXArticleProps) for the prop contract.
+
+   Why next-mdx-remote/rsc and not @mdx-js/mdx directly: this gives us
+   automatic frontmatter parsing (via `parseFrontmatter`) and RSC-aware
+   compilation that interleaves with the rest of the App Router page tree
+   correctly. The cost: this module only works in a Next.js RSC env. */
 
 export async function MDXArticle({
   source,
@@ -42,8 +36,7 @@ export async function MDXArticle({
         // serialization constraint to worry about.
         remarkPlugins: [
           // GFM enables tables, task lists, strikethrough, autolinks —
-          // all common in AI-tool reply content and rendered standardly
-          // across all themes.
+          // all common in AI-tool reply content.
           remarkGfm,
         ],
         rehypePlugins: [
@@ -56,7 +49,7 @@ export async function MDXArticle({
           // rehypeAddCopyContent must run AFTER Shiki — Shiki rebuilds
           // the <pre><code> subtree and would drop properties added
           // earlier. Running last lets us walk Shiki's tokenized tree
-          // for both the raw text (data-content) and the language id
+          // for both the raw text (data-content) and language id
           // (data-lang).
           rehypeAddCopyContent,
         ],

@@ -4,6 +4,8 @@ const FONT_STACK =
   "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 const SERIF_STACK =
   "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
+const MONO_STACK =
+  "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace";
 
 const INK = "#1f1b16";
 const INK_SOFT = "rgba(31, 27, 22, 0.62)";
@@ -85,28 +87,36 @@ export default function Index() {
                 boxShadow: "0 0 0 4px rgba(168,90,31,0.14)",
               }}
             />
-            Next.js MDX template
+            <span style={{ fontFamily: MONO_STACK, fontSize: "0.92rem" }}>
+              prose-atelier
+            </span>
           </span>
-          <a
-            href="https://github.com/hifizz/mdx-article-template"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="View source on GitHub"
+          <span
             style={{
               display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center",
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              color: INK,
-              background: "rgba(255,255,255,0.6)",
-              border: `1px solid ${HAIRLINE}`,
-              backdropFilter: "blur(8px)",
+              gap: "0.5rem",
             }}
           >
-            <GitHubMark />
-          </a>
+            <a
+              href="https://www.npmjs.com/package/prose-atelier"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="View on npm"
+              style={iconButton}
+            >
+              <NpmMark />
+            </a>
+            <a
+              href="https://github.com/hifizz/prose-atelier"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="View source on GitHub"
+              style={iconButton}
+            >
+              <GitHubMark />
+            </a>
+          </span>
         </header>
 
         {/* Hero */}
@@ -145,10 +155,10 @@ export default function Index() {
               maxWidth: "20ch",
             }}
           >
-            Editorial articles,
+            Long-form articles,
             <br />
             <span style={{ fontStyle: "italic", color: ACCENT }}>
-              without the boilerplate
+              in the voice you pick
             </span>
             .
           </h1>
@@ -162,11 +172,34 @@ export default function Index() {
               color: INK_SOFT,
             }}
           >
-            A Next.js template for long-form writing — typography, left-rail
-            TOC, Shiki-tokenized code with copy &amp; auto-collapse, and Mermaid
-            diagrams. Drop a file in <code style={codeInline}>content/</code>,
-            run <code style={codeInline}>pnpm dev</code>, ship.
+            An open-source MDX article pipeline — typography, left-rail TOC,
+            Shiki-tokenized code with copy &amp; auto-collapse, Mermaid
+            diagrams, and three themes (editorial / notebook / chat). Drop a
+            file in <code style={codeInline}>content/</code>, ship.
           </p>
+
+          <div
+            aria-label="Install command"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.65rem",
+              alignSelf: "flex-start",
+              padding: "0.7rem 0.95rem",
+              background: "rgba(31, 27, 22, 0.04)",
+              border: `1px solid ${HAIRLINE}`,
+              borderRadius: 10,
+              fontFamily: MONO_STACK,
+              fontSize: "0.9rem",
+              color: INK,
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <span aria-hidden style={{ color: INK_FAINT }}>
+              $
+            </span>
+            <span>pnpm add prose-atelier</span>
+          </div>
 
           <div
             style={{
@@ -236,24 +269,10 @@ export default function Index() {
               }}
             >
               Chat demo
-              <span
-                aria-hidden
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: 500,
-                  color: ACCENT,
-                  padding: "0.1rem 0.45rem",
-                  borderRadius: 999,
-                  background: "rgba(168, 90, 31, 0.1)",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                NEW
-              </span>
               <span aria-hidden>→</span>
             </Link>
             <a
-              href="https://github.com/hifizz/mdx-article-template#readme"
+              href="https://github.com/hifizz/prose-atelier#readme"
               target="_blank"
               rel="noreferrer"
               style={{
@@ -267,6 +286,141 @@ export default function Index() {
             >
               Read the README
             </a>
+          </div>
+        </section>
+
+        {/* Style gallery — every supported theme × density combination */}
+        <section
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.25rem",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: SERIF_STACK,
+                fontSize: "1.6rem",
+                fontWeight: 500,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              <span style={{ fontStyle: "italic", color: ACCENT }}>Every</span>{" "}
+              supported style
+            </h2>
+            <span
+              style={{
+                fontSize: "0.85rem",
+                color: INK_SOFT,
+              }}
+            >
+              3 themes · chat has 4 density steps inside
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(13rem, 1fr))",
+              gap: "0.85rem",
+            }}
+          >
+            {STYLES.map((s) => (
+              <Link
+                key={s.href}
+                href={s.href}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.45rem",
+                  padding: "1.1rem 1.2rem 1.15rem",
+                  background: "rgba(255,255,255,0.78)",
+                  border: `1px solid ${HAIRLINE}`,
+                  borderRadius: 16,
+                  textDecoration: "none",
+                  color: INK,
+                  backdropFilter: "blur(8px)",
+                  transition: "transform 120ms ease, border-color 120ms ease",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: SERIF_STACK,
+                      fontStyle: "italic",
+                      fontSize: "0.78rem",
+                      color: ACCENT,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {s.kind}
+                  </span>
+                  {s.badge && (
+                    <span
+                      style={{
+                        fontSize: "0.66rem",
+                        fontFamily:
+                          "ui-monospace, SFMono-Regular, 'SF Mono', monospace",
+                        padding: "0.1rem 0.4rem",
+                        borderRadius: 4,
+                        background: "rgba(31,27,22,0.06)",
+                        color: INK_SOFT,
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {s.badge}
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontSize: "1.02rem",
+                    fontWeight: 600,
+                    letterSpacing: "-0.005em",
+                  }}
+                >
+                  {s.title}
+                </span>
+                <span
+                  style={{
+                    fontSize: "0.85rem",
+                    color: INK_SOFT,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {s.body}
+                </span>
+                <span
+                  style={{
+                    marginTop: "0.15rem",
+                    fontSize: "0.78rem",
+                    color: INK_FAINT,
+                    fontFamily:
+                      "ui-monospace, SFMono-Regular, 'SF Mono', monospace",
+                  }}
+                >
+                  {s.href} →
+                </span>
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -371,12 +525,25 @@ export default function Index() {
 }
 
 const codeInline: React.CSSProperties = {
-  fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace",
+  fontFamily: MONO_STACK,
   fontSize: "0.92em",
   padding: "0.1em 0.4em",
   borderRadius: 6,
   background: "rgba(31, 27, 22, 0.06)",
   border: `1px solid ${HAIRLINE}`,
+};
+
+const iconButton: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 36,
+  height: 36,
+  borderRadius: 999,
+  color: INK,
+  background: "rgba(255,255,255,0.6)",
+  border: `1px solid ${HAIRLINE}`,
+  backdropFilter: "blur(8px)",
 };
 
 function GitHubMark() {
@@ -396,6 +563,20 @@ function GitHubMark() {
   );
 }
 
+function NpmMark() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 18 18"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M0 0v16h7v2h4v-2h7V0H0zm15 14h-4V4H7v10H2V2h13v12zm-6-2v-8h2v8H9z" />
+    </svg>
+  );
+}
+
 const FEATURES = [
   {
     label: "01",
@@ -409,7 +590,31 @@ const FEATURES = [
   },
   {
     label: "03",
-    title: "Vendorable in 30 seconds",
-    body: "app/_mdx/ is a self-contained folder. Copy it into any Next.js project, add a content directory, ship.",
+    title: "One install, one CSS import",
+    body: "pnpm add prose-atelier. Import the stylesheet from your root layout, re-export the catchall route in one line. Ship.",
+  },
+];
+
+const STYLES = [
+  {
+    kind: "Editorial",
+    title: "Magazine layout",
+    body: "Serif headlines, fixed left-rail TOC, h2-as-divider. The default for long-form articles.",
+    href: "/example",
+    badge: "theme",
+  },
+  {
+    kind: "Notebook",
+    title: "Tech blog",
+    body: "Single column, inline h2s, dashed-underline emphasis. CJK-tuned, no TOC.",
+    href: "/example-notebook",
+    badge: "theme",
+  },
+  {
+    kind: "Chat",
+    title: "AI reply",
+    body: "Tuned for AI coding-tool replies. Four density steps (XS/SM/MD/LG), switchable live at the top of the page.",
+    href: "/example-chat",
+    badge: "theme",
   },
 ];

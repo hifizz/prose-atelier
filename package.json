@@ -1,33 +1,18 @@
 {
-  "name": "article-template",
-  "version": "0.1.0",
+  "name": "prose-atelier-workspace",
+  "version": "0.0.0",
   "private": true,
-  "description": "MDX-driven editorial article template with left-rail TOC. Originally extracted from playground.zilin.im / inspired by benji.org/liveline.",
+  "description": "Monorepo: the prose-atelier npm package + the article-template demo app.",
   "scripts": {
-    "dev": "next dev --port 3090",
-    "build": "next build",
-    "start": "next start --port 3090",
-    "lint": "eslint"
+    "build": "pnpm --filter prose-atelier build",
+    "dev:pkg": "pnpm --filter prose-atelier dev",
+    "dev": "pnpm --filter article-template dev",
+    "lint": "pnpm -r --parallel lint",
+    "pack:pkg": "pnpm --filter prose-atelier pack",
+    "publish:pkg": "pnpm --filter prose-atelier publish --access public"
   },
-  "dependencies": {
-    "@shikijs/rehype": "^4.0.2",
-    "@shikijs/transformers": "^4.0.2",
-    "mermaid": "^11.14.0",
-    "next": "16.0.10",
-    "next-mdx-remote": "^6.0.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "rehype-slug": "^6.0.0",
-    "remark-gfm": "^4.0.1",
-    "shiki": "^4.0.2",
-    "unist-util-visit": "^5.1.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.3",
-    "typescript": "^5"
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
   }
 }

@@ -1,3 +1,7 @@
+> **归档说明**：此文件为 2026-Q2 npm 包拆分的历史规划，工作名 `next-mdx-article` 仅是当时的占位。最终落地包名为 `prose-atelier`（详见根 `README.md`）。文内 `next-mdx-article` 字样保持原貌作为历史快照，请勿做全局替换。
+
+---
+
 # 计划：把 `app/_mdx/` 抽成一个发布到 npm 的 Next.js 包
 
 ## 背景
